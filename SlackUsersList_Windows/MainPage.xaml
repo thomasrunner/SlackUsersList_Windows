@@ -1,0 +1,90 @@
+﻿<Page
+    x:Class="SlackUsersList_Windows.MainPage"
+    xmlns:userslistview="using:SlackUsersList_Windows.View"
+    xmlns:userslistsrc="using:SlackUsersList_Windows"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SlackUsersList_Windows"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Border Background="White">
+            <Grid>
+                <Border>
+                    <Grid>
+                        <Border x:Name="TitleBorder" VerticalAlignment="Top" Height="64" BorderBrush="#FFE0E0E0" BorderThickness="0,0,0,1">
+                            <Grid>
+                                <Image x:Name="SlackLogoImage" Tapped="SlackLogoImage_Tapped" HorizontalAlignment="Left" Width="28" Source="Assets/slack_logo_128px.png" Margin="10,4,0,0"></Image>
+                                <TextBlock VerticalAlignment="Center" Text="Slack Team" Foreground="#FF202020" FontFamily="Segoe UI" FontSize="22" TextAlignment="Center" Padding="64,0,0,0" Margin="42,0,110,8" TextWrapping="Wrap" />
+                                <Border Tapped="TitleStatusTypeButtonBorder_Tapped" x:Name="TitleStatusTypeButtonBorder" HorizontalAlignment="Right" Width="110" Background="White">
+                                    <Grid>
+                                        <TextBlock  x:Name="TitleMemberListTypeTextBlock" Text="All" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF00CA8C" FontFamily="Segoe UI" FontSize="20" Height="24" Margin="0,0,34,4" />
+                                        <Border x:Name="TitleMemberListTypeStatusBorder" Height="14" Width="14" CornerRadius="7" Margin="0,5,12,0" VerticalAlignment="Center" MinWidth="0" HorizontalAlignment="Right" Background="#FFE0E0E0"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <Border x:Name="UserSearchBorder" Background="#FFD7D7D7" Height="48" Margin="8,72,8,16" CornerRadius="8" VerticalAlignment="Top">
+                            <TextBox x:Name="UserSearchTextBox" LostFocus="UserSearchTextBox_LostFocus" GotFocus="UserSearchTextBox_GotFocus"  KeyUp="UserSearchTextBox_KeyUp"  Text="search" Padding="15,12,8,0"  FontSize="18" FontFamily="Segoe UI" VerticalAlignment="Stretch" BorderThickness="0" BorderBrush="{x:Null}" Background="{x:Null}" Margin="0,-1,0.167,0" Foreground="#FF404040" />
+                        </Border>
+
+                        <userslistview:UsersListView x:Name="UsersListLiveView" Margin="0,136,0,0" Background="Black" HorizontalContentAlignment="Stretch"  />
+
+                        <StackPanel x:Name="RightPanelUserStatusTypeListBorder" Background="#FFF0F0F0" Width="140" HorizontalAlignment="Right" Visibility="Collapsed">
+                            <Border Tapped="RightPanelUserStatusTypeStackItem_Tapped" x:Name="RightPanelStatusTypeItemAllBorder"   HorizontalAlignment="Right" Width="140" Height="63" Background="#FFF0F0F0">
+                                <Grid>
+                                    <TextBlock  x:Name="RightPanelAllTypeTextBlock" Text="All" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF222222" FontFamily="Segoe UI" FontSize="20" Height="24" Margin="0,0,34,4" />
+                                    <Border x:Name="RightPanelAllTypeStatusBorder" Height="19" Width="19" CornerRadius="7" Margin="0,22,11,22" VerticalAlignment="Center" MinWidth="0" HorizontalAlignment="Right">
+                                        <Border.Background>
+                                            <ImageBrush Stretch="Uniform" ImageSource="Assets/slack_logo_128px.png"/>
+                                        </Border.Background>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                            <Border Tapped="RightPanelUserStatusTypeStackItem_Tapped" x:Name="RightPanelStatusTypeItemAdminBorder" HorizontalAlignment="Right" Width="140" Height="63" Background="#FFF0F0F0">
+                                <Grid>
+                                    <TextBlock  x:Name="RightPanelAdminTypeTextBlock" Text="Admin" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF222222" FontFamily="Segoe UI" FontSize="20" Height="24" Margin="0,0,34,4" />
+                                    <Border x:Name="RightPanelAdminTypeStatusBorder" Height="14" Width="14" CornerRadius="7" Margin="0,5,12,0" VerticalAlignment="Center" MinWidth="0" HorizontalAlignment="Right" Background="#FFFFC420"/>
+                                </Grid>
+                            </Border>
+                            <Border Tapped="RightPanelUserStatusTypeStackItem_Tapped" x:Name="RightPanelStatusTypeItemOwnerBorder" HorizontalAlignment="Right" Width="140" Height="63" Background="#FFF0F0F0">
+                                <Grid>
+                                    <TextBlock  x:Name="RightPanelOwnerTypeTextBlock" Text="Owner" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF222222" FontFamily="Segoe UI" FontSize="20" Height="24" Margin="0,0,34,4" />
+                                    <Border x:Name="RightPanelOwnerTypeStatusBorder" Height="14" Width="14" CornerRadius="7" Margin="0,5,12,0" VerticalAlignment="Center" MinWidth="0" HorizontalAlignment="Right" Background="#FFFFC420"/>
+                                </Grid>
+                            </Border>
+                            <Border Tapped="RightPanelUserStatusTypeStackItem_Tapped" x:Name="RightPanelStatusTypeItemActiveBorder" HorizontalAlignment="Right" Width="140" Height="63" Background="#FFF0F0F0">
+                                <Grid>
+                                    <TextBlock  x:Name="RightPanelActiveTypeTextBlock" Text="Active" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF222222" FontFamily="Segoe UI" FontSize="20" Height="24" Margin="0,0,34,4" />
+                                    <Border x:Name="RightPanelActiveStatusBorder" Height="14" Width="14" CornerRadius="7" Margin="0,5,12,0" VerticalAlignment="Center" MinWidth="0" HorizontalAlignment="Right" Background="#FF40E080"/>
+                                </Grid>
+                            </Border>
+                            <Border Tapped="RightPanelUserStatusTypeStackItem_Tapped" x:Name="RightPanelStatusTypeItemBotsBorder" HorizontalAlignment="Right" Width="140" Height="63" Background="#FFF0F0F0">
+                                <Grid>
+                                    <TextBlock  x:Name="RightPanelBotTypeTextBlock" Text="Bots" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF222222" FontFamily="Segoe UI" FontSize="20" Height="24" Margin="0,0,34,4" />
+                                    <Border x:Name="RightPanelBotStatusBorder" Height="14" Width="14" CornerRadius="7" Margin="0,5,12,0" VerticalAlignment="Center" MinWidth="0" HorizontalAlignment="Right" Background="#FF40C4FF"/>
+                                </Grid>
+                            </Border>
+                            <Border Tapped="RightPanelUserStatusTypeStackItem_Tapped" x:Name="RightPanelStatusTypeItemDeletedBorder" HorizontalAlignment="Right" Width="140" Height="63" Background="#FFF0F0F0">
+                                <Grid>
+                                    <TextBlock  x:Name="RightPanelDeletedTypeTextBlock" Text="Deleted" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF222222" FontFamily="Segoe UI" FontSize="20" Height="24" Margin="0,0,34,4" />
+                                    <Border x:Name="RightPanelDeletedStatusBorder" Height="14" Width="14" CornerRadius="7" Margin="0,5,12,0" VerticalAlignment="Center" MinWidth="0" HorizontalAlignment="Right" Background="#FFFF4040"/>
+                                </Grid>
+                            </Border>
+                            <Border Tapped="RightPanelUserStatusTypeStackItem_Tapped" x:Name="RightPanelStatusTypeItemAwayBorder" HorizontalAlignment="Right" Width="140" Height="63" Background="#FFF0F0F0">
+                                <Grid>
+                                    <TextBlock  x:Name="RightPanelAwayTypeTextBlock" Text="Away" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF222222" FontFamily="Segoe UI" FontSize="20" Height="24" Margin="0,0,34,4" />
+                                    <Border x:Name="RightPanelAwayStatusBorder" Height="14" Width="14" CornerRadius="7" Margin="0,5,12,0" VerticalAlignment="Center" MinWidth="0" HorizontalAlignment="Right" Background="#FFFF4040"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>
