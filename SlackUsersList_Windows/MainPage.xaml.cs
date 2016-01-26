@@ -42,9 +42,6 @@ namespace SlackUsersList_Windows
             RightPanelBotStatusBorder.Background = (App.Current as App).usercolorstatusdict["bots"];
             RightPanelDeletedStatusBorder.Background = (App.Current as App).usercolorstatusdict["deleted"];
             RightPanelAwayStatusBorder.Background = (App.Current as App).usercolorstatusdict["away"];
-
-
-            
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -65,7 +62,7 @@ namespace SlackUsersList_Windows
             //Hardware Back Button
             //HardwareButtons.BackPressed += OnBackButton;
 
-            //No Network Connections
+            //Network Connection Check
             bool hasNetworkConnection = NetworkInterface.GetIsNetworkAvailable();
 
             if (hasNetworkConnection == false)
@@ -197,7 +194,7 @@ namespace SlackUsersList_Windows
         /// <param name="e"></param>
         private void UserSearchTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (UserSearchTextBox.Text == "search")
+            if (UserSearchTextBox.Text == "search (name, firstname or role)")
             {
                 UserSearchTextBox.Text = "";
             }
@@ -208,7 +205,7 @@ namespace SlackUsersList_Windows
         {
             if (UserSearchTextBox.Text.Trim().Length == 0)
             {
-                UserSearchTextBox.Text = "search";
+                UserSearchTextBox.Text = "search (name, firstname or role)";
             }
         }
 
@@ -294,10 +291,10 @@ namespace SlackUsersList_Windows
         private async void ReloadUserListBorder_Tapped(object sender, TappedRoutedEventArgs e)
         {
             //Resets the search UI elements
-            UserSearchTextBox.Text = "search";
+            UserSearchTextBox.Text = "search (name, firstname or role)";
             TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["all"];
             TitleMemberListTypeTextBlock.Text = "All";
-            UserSearchTextBox.Text = "all";
+            UserSearchTextBox.Text = "search (name, firstname or role)";
 
             //No Network Connections
             bool hasNetworkConnection = NetworkInterface.GetIsNetworkAvailable();
@@ -311,9 +308,14 @@ namespace SlackUsersList_Windows
 
         private void UserProfilePhoneBorder_Tapped(object sender, TappedRoutedEventArgs e)
         {
-
+            //Add Code to Launch Phone in UWA
         }
 
+        /// <summary>
+        /// Launches email app with email of selected user. This option is only visible if the selected user has an email address
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void UserProfileEmailBorder_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if(selecteduser != null)
@@ -325,15 +327,21 @@ namespace SlackUsersList_Windows
 
         private void UserProfileEditButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
-
+            //Layout filler code that should launch the profile edit but when the active user is looking at their own profile.
         }
 
 
+        /// <summary>
+        /// This event gets triggered when an item is selected from the UsersListView View ListView.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void UsersListLiveView_SelectedUserListViewItem(object sender, EventArgs e)
         {
             //Ideally this should be some sort of local database
-
             selecteduser = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.id == UsersListLiveView.SelectUserID))[0];
+
+            if (selecteduser == null) return;
 
             //Profile Title
             UserProfileTitleNamewithAtTextBlock.Text = selecteduser.NamewithAtSymbol;
@@ -410,7 +418,7 @@ namespace SlackUsersList_Windows
                 UserProfileNameBelowPhotoTextBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 170, 52, 255));
             }
 
-            //No Network Connections
+            //Network Connection Check, data will still load so this is simply a warning not an error.
             bool hasNetworkConnection = NetworkInterface.GetIsNetworkAvailable();
 
             if (hasNetworkConnection == false)

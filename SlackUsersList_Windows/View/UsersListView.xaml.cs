@@ -21,15 +21,17 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 /// <summary>
-/// The UsersListView as part of the Slack User List Model View ViewModel
+/// The UsersListView is part of the Slack User List Model View ViewModel
 /// This View uses the User Model and UsersListViewModel ViewModel
 /// </summary> 
 namespace SlackUsersList_Windows.View
 {
     public sealed partial class UsersListView : UserControl
     {
+        //Unlike WP8.1 this function replace the Navigation to another page by exposing an event that can be track in the parent class.
         public event EventHandler SelectedUserListViewItem;
 
+        //A User EventArgs class can be created to pass along much more data, but for this example a simple public property is nice and clean solution.
         String selecteduserid = "";
         public String SelectUserID 
         {
@@ -43,7 +45,7 @@ namespace SlackUsersList_Windows.View
         }
 
         /// <summary>
-        /// This is just a general function to load user profiles. Additional functions to manage user is very simple if admin account.
+        /// This is just a general function to load user profiles. Additional functions to manage users is very simple if admin account.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -60,7 +62,6 @@ namespace SlackUsersList_Windows.View
                 
             }
         }
-
 
     }
 }

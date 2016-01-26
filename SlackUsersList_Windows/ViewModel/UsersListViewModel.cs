@@ -280,10 +280,10 @@ namespace SlackUsersList.ViewModel
         /// <param name="filename"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        private async Task saveJSONStringToLocalFile(string filename, string content)
+        private async Task saveJSONStringToLocalFile(string filename, string jsonstring)
         {
-            // saves the string 'content' to a file 'filename' in the app's local storage folder
-            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(content.ToCharArray());
+            // saves the string 'jsonstring' to a file 'filename' in the app's local storage folder
+            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(jsonstring.ToCharArray());
 
             // create a file with the given filename in the local folder; replace any existing file with the same name
             StorageFile file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
@@ -308,15 +308,15 @@ namespace SlackUsersList.ViewModel
             StorageFolder local = Windows.Storage.ApplicationData.Current.LocalFolder;
             // open the file 'filename' for reading
             Stream stream = await local.OpenStreamForReadAsync(filename);
-            string text;
+            string jsonstring;
 
             // copy the file contents into the string 'text'
             using (StreamReader reader = new StreamReader(stream))
             {
-                text = reader.ReadToEnd();
+                jsonstring = reader.ReadToEnd();
             }
 
-            return text;
+            return jsonstring;
         }
     }
 }

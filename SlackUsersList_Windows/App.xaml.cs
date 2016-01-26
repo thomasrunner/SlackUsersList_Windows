@@ -42,6 +42,7 @@ namespace SlackUsersList_Windows
             this.InitializeComponent();
             this.Suspending += OnSuspending;
 
+            //Setting user profile status colors when app is launched.
             if (usercolorstatusdict == null)
             {
                 usercolorstatusdict = new Dictionary<string, SolidColorBrush>();
@@ -57,7 +58,7 @@ namespace SlackUsersList_Windows
 
         protected override void OnActivated(IActivatedEventArgs args)
         {
-
+            //Setting user profile status colors when app is reactivated.
             if (usercolorstatusdict == null)
             {
                 usercolorstatusdict = new Dictionary<string, SolidColorBrush>();

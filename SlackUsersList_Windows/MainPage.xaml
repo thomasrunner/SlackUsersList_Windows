@@ -57,7 +57,7 @@
                         </Border>
 
                         <Border x:Name="UserSearchBorder" Background="#FFD7D7D7" Height="48" Margin="8,72,8,16" CornerRadius="8" VerticalAlignment="Top">
-                            <TextBox x:Name="UserSearchTextBox" LostFocus="UserSearchTextBox_LostFocus" GotFocus="UserSearchTextBox_GotFocus"  KeyUp="UserSearchTextBox_KeyUp"  Text="search" Padding="15,12,8,0"  FontSize="18" FontFamily="Segoe UI" VerticalAlignment="Stretch" BorderThickness="0" BorderBrush="{x:Null}" Background="{x:Null}" Margin="0,-1,0.167,0" Foreground="#FF404040" />
+                            <TextBox x:Name="UserSearchTextBox" LostFocus="UserSearchTextBox_LostFocus" GotFocus="UserSearchTextBox_GotFocus"  KeyUp="UserSearchTextBox_KeyUp"  Text="search (name, firstname or role)" Padding="15,12,8,0"  FontSize="18" FontFamily="Segoe UI" VerticalAlignment="Stretch" BorderThickness="0" BorderBrush="{x:Null}" Background="{x:Null}" Margin="0,-1,0.167,0" Foreground="#FF404040" />
                         </Border>
 
                         <userslistview:UsersListView x:Name="UsersListLiveView" SelectedUserListViewItem="UsersListLiveView_SelectedUserListViewItem" Margin="0,136,0,0" Background="Black" HorizontalContentAlignment="Stretch"  />
