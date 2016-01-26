@@ -8,6 +8,7 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -24,6 +25,7 @@ namespace SlackUsersList_Windows
     public sealed partial class MainPage : Page
     {
         private UsersListViewModel userviewmodel;
+        private User selecteduser;
 
         public MainPage()
         {
@@ -40,6 +42,9 @@ namespace SlackUsersList_Windows
             RightPanelBotStatusBorder.Background = (App.Current as App).usercolorstatusdict["bots"];
             RightPanelDeletedStatusBorder.Background = (App.Current as App).usercolorstatusdict["deleted"];
             RightPanelAwayStatusBorder.Background = (App.Current as App).usercolorstatusdict["away"];
+
+
+            
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -72,6 +77,26 @@ namespace SlackUsersList_Windows
                 }));
                 messageDialog.DefaultCommandIndex = 1;
                 await messageDialog.ShowAsync();
+            }
+
+            //This is just a data page filler and should use the loggedin user account in a more complete solution.
+            if((App.Current as App).localuserlistcollection != null)
+            {
+                if((App.Current as App).localuserlistcollection.Count > 0)
+                {
+                    User user = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.is_admin == true || x.is_owner == true))[0];
+
+                    MainPanelProfileNameTextBlock.Text = user.NamewithAtSymbol;
+
+                    MainPanelProfileStatusIndicatorBorder.Background = user.UserPresenceExcludingAwayStatusColor;
+                    if(user.presence == "away")
+                    {
+                        MainPanelProfileStatusTextBlock.Text = "away";
+                    }
+                    ImageBrush imagebrush = new ImageBrush();
+                    imagebrush.ImageSource = user.image_192;
+                    MainPanelProfilePhotoBorder.Background = imagebrush;
+                }
             }
         }
 
@@ -266,8 +291,13 @@ namespace SlackUsersList_Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void SlackLogoImage_Tapped(object sender, TappedRoutedEventArgs e)
+        private async void ReloadUserListBorder_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            //Resets the search UI elements
+            UserSearchTextBox.Text = "search";
+            TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["all"];
+            TitleMemberListTypeTextBlock.Text = "All";
+            UserSearchTextBox.Text = "all";
 
             //No Network Connections
             bool hasNetworkConnection = NetworkInterface.GetIsNetworkAvailable();
@@ -277,6 +307,129 @@ namespace SlackUsersList_Windows
                 await userviewmodel.PopulateUsers(false);
                 UsersListLiveView.DataContext = userviewmodel.UsersList;
             }
+        }
+
+        private void UserProfilePhoneBorder_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+        }
+
+        private async void UserProfileEmailBorder_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if(selecteduser != null)
+            { 
+                var mailto = new Uri("mailto:" + selecteduser.profile.email);
+                await Windows.System.Launcher.LaunchUriAsync(mailto);
+            }
+        }
+
+        private void UserProfileEditButton_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
+        }
+
+
+        private async void UsersListLiveView_SelectedUserListViewItem(object sender, EventArgs e)
+        {
+            //Ideally this should be some sort of local database
+
+            selecteduser = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.id == UsersListLiveView.SelectUserID))[0];
+
+            //Profile Title
+            UserProfileTitleNamewithAtTextBlock.Text = selecteduser.NamewithAtSymbol;
+
+            //Name Under Photo
+            UserProfileNameBelowPhotoTextBlock.Text = selecteduser.RealNamewithNameFailover;
+
+            //Presence Symbol Color
+            UserProfileStatusIndicatorBorder.Background = selecteduser.UserPresenceExcludingAwayStatusColor;
+
+            //Presence Symbol "Z"
+            if (selecteduser.presence == "away")
+            {
+                UserProfileZStatusIndicatorBorder.Visibility = Visibility.Visible;
+                UserProfileZStatusIndicatorTextBox.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                UserProfileZStatusIndicatorBorder.Visibility = Visibility.Collapsed;
+                UserProfileZStatusIndicatorTextBox.Visibility = Visibility.Collapsed;
+            }
+
+            //Role
+            UserProfileRoleTextBlock.Text = selecteduser.profile.title;
+
+            //Message Button
+            UserProfileMessageTextBlock.Text = "Message " + selecteduser.NamewithAtSymbol;
+
+            //Email Button
+            if (selecteduser.profile.email.Length > 0)
+            {
+                UserProfileEmailBorder.Visibility = Visibility.Visible;
+                UserProfileEmailTextBlock.Text = selecteduser.profile.email;
+            }
+            else
+            {
+                UserProfileEmailBorder.Visibility = Visibility.Collapsed;
+            }
+
+            //Skype Button
+            if (selecteduser.profile.skype.Length > 0)
+            {
+                UserProfileSkypeBorder.Visibility = Visibility.Visible;
+                UserProfileSkypeTextBlock.Text = selecteduser.profile.skype;
+            }
+            else
+            {
+                UserProfileSkypeBorder.Visibility = Visibility.Collapsed;
+            }
+
+            //Phone Button
+            if (selecteduser.profile.phone.Length > 0)
+            {
+                UserProfilePhoneBorder.Visibility = Visibility.Visible;
+                UserProfilePhoneTextBlock.Text = selecteduser.profile.phone;
+            }
+            else
+            {
+                UserProfilePhoneBorder.Visibility = Visibility.Collapsed;
+            }
+
+            //Profile Photo
+            ImageBrush imagebrush = new ImageBrush();
+            imagebrush.ImageSource = selecteduser.image_192;
+            UserProfilePhotoBorder.Background = imagebrush;
+
+            //IsSlackBot
+            if (selecteduser.IsSlackBot == true)
+            {
+                UserProfileNameBelowPhotoTextBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
+            }
+            else
+            {
+                UserProfileNameBelowPhotoTextBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 170, 52, 255));
+            }
+
+            //No Network Connections
+            bool hasNetworkConnection = NetworkInterface.GetIsNetworkAvailable();
+
+            if (hasNetworkConnection == false)
+            {
+                var messageDialog = new MessageDialog("No Internet Connection.");
+                messageDialog.Commands.Add(new UICommand("Ok", (command) =>
+                {
+                    return;
+                }));
+                messageDialog.DefaultCommandIndex = 1;
+                await messageDialog.ShowAsync();
+            }
+
+            UserProfileBorder.Visibility = Visibility.Visible;
+        }
+
+        private void UserProfileBackArrowBorder_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            UserProfileBorder.Visibility = Visibility.Collapsed;
         }
     }
 }

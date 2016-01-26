@@ -128,7 +128,9 @@
     <None Include="SlackUsersList_Windows_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\arrow_forward_50px.png" />
     <Content Include="Assets\Logo.scale-100.png" />
+    <Content Include="Assets\reload_50px.png" />
     <Content Include="Assets\slack_logo_128px.png" />
     <Content Include="Assets\SmallLogo.scale-100.png" />
     <Content Include="Assets\SplashScreen.scale-100.png" />

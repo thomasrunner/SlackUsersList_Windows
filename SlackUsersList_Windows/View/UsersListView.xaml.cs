@@ -6,6 +6,7 @@
 using SlackUsersList_Windows.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -27,6 +28,15 @@ namespace SlackUsersList_Windows.View
 {
     public sealed partial class UsersListView : UserControl
     {
+        public event EventHandler SelectedUserListViewItem;
+
+        String selecteduserid = "";
+        public String SelectUserID 
+        {
+            get { return selecteduserid; }
+            set { selecteduserid = value; }
+        } 
+
         public UsersListView()
         {
             this.InitializeComponent();
@@ -42,7 +52,12 @@ namespace SlackUsersList_Windows.View
             User user = ((FrameworkElement)e.OriginalSource).DataContext as User;
             if (user != null)
             {
-                //(Window.Current.Content as Frame).Navigate(typeof(UserProfilePage), user.id);
+                if (SelectedUserListViewItem != null)
+                {
+                    selecteduserid = user.id;
+                    SelectedUserListViewItem(this, EventArgs.Empty);
+                } 
+                
             }
         }
 

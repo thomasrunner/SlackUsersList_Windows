@@ -12,12 +12,41 @@
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Border Background="White">
             <Grid>
-                <Border>
+                <Border HorizontalAlignment="Left" Width="260" Background="#FF4D394B">
+                    <Grid>
+                        <Border Height="60" VerticalAlignment="Top" Background="#FF3E313C">
+                            <TextBlock VerticalAlignment="Center" Text="Slack Team" Foreground="White" FontFamily="Segoe UI" FontSize="22" TextAlignment="Center" Padding="0" Margin="0,0,0,4" TextWrapping="Wrap" FontWeight="SemiBold" />
+
+                        </Border>
+
+                        <Border Height="80" VerticalAlignment="Bottom" Background="#FF3E313C">
+                            <Grid>
+                                <Border x:Name="MainPanelProfilePhotoBorder" Width="48" HorizontalAlignment="Left" Margin="12,0,0,0" Height="48" CornerRadius="4" BorderThickness="0">
+                                    <Border.Background>
+                                        <ImageBrush Stretch="Uniform" ImageSource="Assets/slack_logo_128px.png"/>
+                                    </Border.Background>
+                                </Border>
+                                <StackPanel Margin="70,10,0,0">
+                                    <TextBlock x:Name="MainPanelProfileNameTextBlock" Text="profile name" FontFamily="Segoe UI" FontSize="20"></TextBlock>
+                                    <Border >
+                                        <Grid>
+                                            <TextBlock x:Name="MainPanelProfileStatusTextBlock"  Text="online" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FFC4C4C4" FontFamily="Segoe UI" FontSize="18" Height="24" Margin="31,1,0,3" />
+                                            <Border x:Name="MainPanelProfileStatusIndicatorBorder"  Height="14" Width="14" CornerRadius="7" Margin="9,0,0,0" VerticalAlignment="Center" MinWidth="0" HorizontalAlignment="Left" Background="#FFFFC420"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+                
+                <Border Margin="260,0,0,0" Width="360" HorizontalAlignment="Left" BorderBrush="#FFE0E0E0" BorderThickness="1,0">
                     <Grid>
                         <Border x:Name="TitleBorder" VerticalAlignment="Top" Height="64" BorderBrush="#FFE0E0E0" BorderThickness="0,0,0,1">
                             <Grid>
-                                <Image x:Name="SlackLogoImage" Tapped="SlackLogoImage_Tapped" HorizontalAlignment="Left" Width="28" Source="Assets/slack_logo_128px.png" Margin="10,4,0,0"></Image>
-                                <TextBlock VerticalAlignment="Center" Text="Slack Team" Foreground="#FF202020" FontFamily="Segoe UI" FontSize="22" TextAlignment="Center" Padding="64,0,0,0" Margin="42,0,110,8" TextWrapping="Wrap" />
+                                <Button Tapped="ReloadUserListBorder_Tapped" x:Name="ReloadUserListBorder" BorderBrush="{x:Null}" BorderThickness="0" Width="48" Height="48" Padding="0" Background="White">
+                                    <Image   HorizontalAlignment="Center" Width="32" Source="Assets/reload_50px.png" Margin="0" Height="32"></Image>
+                                </Button>
                                 <Border Tapped="TitleStatusTypeButtonBorder_Tapped" x:Name="TitleStatusTypeButtonBorder" HorizontalAlignment="Right" Width="110" Background="White">
                                     <Grid>
                                         <TextBlock  x:Name="TitleMemberListTypeTextBlock" Text="All" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF00CA8C" FontFamily="Segoe UI" FontSize="20" Height="24" Margin="0,0,34,4" />
@@ -31,7 +60,7 @@
                             <TextBox x:Name="UserSearchTextBox" LostFocus="UserSearchTextBox_LostFocus" GotFocus="UserSearchTextBox_GotFocus"  KeyUp="UserSearchTextBox_KeyUp"  Text="search" Padding="15,12,8,0"  FontSize="18" FontFamily="Segoe UI" VerticalAlignment="Stretch" BorderThickness="0" BorderBrush="{x:Null}" Background="{x:Null}" Margin="0,-1,0.167,0" Foreground="#FF404040" />
                         </Border>
 
-                        <userslistview:UsersListView x:Name="UsersListLiveView" Margin="0,136,0,0" Background="Black" HorizontalContentAlignment="Stretch"  />
+                        <userslistview:UsersListView x:Name="UsersListLiveView" SelectedUserListViewItem="UsersListLiveView_SelectedUserListViewItem" Margin="0,136,0,0" Background="Black" HorizontalContentAlignment="Stretch"  />
 
                         <StackPanel x:Name="RightPanelUserStatusTypeListBorder" Background="#FFF0F0F0" Width="140" HorizontalAlignment="Right" Visibility="Collapsed">
                             <Border Tapped="RightPanelUserStatusTypeStackItem_Tapped" x:Name="RightPanelStatusTypeItemAllBorder"   HorizontalAlignment="Right" Width="140" Height="63" Background="#FFF0F0F0">
@@ -81,7 +110,70 @@
                                 </Grid>
                             </Border>
                         </StackPanel>
+                    </Grid>
+                </Border>
 
+                <Border x:Name="UserProfileBorder" Margin="620,0,0,0" Background="White" Visibility="Collapsed">
+                    <Grid>
+                        <Border Height="64" UseLayoutRounding="False" VerticalAlignment="Top" BorderThickness="0,0,0,1" BorderBrush="#FFE0E0E0">
+                            <Grid>
+                                <Button Tapped="UserProfileBackArrowBorder_Tapped" x:Name="UserProfileBackArrowBorder"  Width="48" HorizontalAlignment="Left" Height="48" Background="#02FFFFFF" AllowDrop="True" Padding="0" BorderBrush="{x:Null}" BorderThickness="0">
+                                    <Image Source="Assets/arrow_forward_50px.png" Width="26" Height="28" RenderTransformOrigin="0.5,0.5" Stretch="Fill">
+                                        <Image.RenderTransform>
+                                            <CompositeTransform ScaleX="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
+                                </Button>
+                                <TextBlock x:Name="UserProfileTitleNamewithAtTextBlock" VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="20" Text="@name" Foreground="#FF202020" Margin="48,0,114,0" Padding="16,0,0,2" TextWrapping="Wrap"/>
+                                <Button Tapped="UserProfileEditButton_Tapped" x:Name="UserProfileEditButton" HorizontalAlignment="Right" Content="Edit" Foreground="#FF00CA8C" Margin="0" BorderThickness="0" Padding="0,0,0,3.5" FontFamily="Segoe UI" FontWeight="Normal" FontSize="20" MinWidth="72"/>
+                            </Grid>
+                        </Border>
+
+                        <ProgressRing Foreground="#FF53AACA" Width="32" HorizontalAlignment="Center" Height="32" IsActive="True" Background="{x:Null}" VerticalAlignment="Top" Margin="0,128,0,0"></ProgressRing>
+                        <Border x:Name="UserProfilePhotoBorder"  CornerRadius="8" Width="128" Height="128" Margin="0,96,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" BorderThickness="1">
+                            <Border.Background>
+                                <ImageBrush Stretch="Fill"/>
+                            </Border.Background>
+                        </Border>
+
+                        <StackPanel Height="32" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,252,0,0">
+                            <TextBlock x:Name="UserProfileNameBelowPhotoTextBlock" Text="name" VerticalAlignment="Center" Margin="0" HorizontalAlignment="Left" Foreground="#FF4D394B" FontFamily="Segoe UI" FontSize="22" Padding="0,0,0,6" FontWeight="SemiBold"/>
+                            <Border x:Name="UserProfileStatusIndicatorBorder" Height="20" Width="20" CornerRadius="12"  Margin="18,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FF7CBD57">
+                                <Border x:Name="UserProfileZStatusIndicatorBorder"  Background="White" CornerRadius="2" Height="12" Width="10" Margin="11,-3,-1,11">
+                                    <TextBlock x:Name="UserProfileZStatusIndicatorTextBox"  Foreground="{Binding Background, ElementName=UserProfileStatusIndicatorBorder}" Text="Z" FontFamily="Segoe UI" Margin="1.5,-2,0,0" MinHeight="0" MinWidth="0"  FontWeight="Bold" Width="9" VerticalAlignment="Top" Height="13"/>
+                                </Border>
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock x:Name="UserProfileRoleTextBlock"  Height="32" VerticalAlignment="Top" Margin="0,283,0,0" TextAlignment="Center" Text="role" Foreground="Gray" FontFamily="Segoe UI" FontSize="18" FontStyle="Italic"></TextBlock>
+
+                        <Border VerticalAlignment="Top" Height="255" Margin="0,352,0,0">
+                            <Grid>
+                                <StackPanel>
+                                    <Border x:Name="UserProfileMessageBorder" Height="64" VerticalAlignment="Top" BorderBrush="#FFE0E0E0" BorderThickness="0,1">
+                                        <TextBlock x:Name="UserProfileMessageTextBlock" TextAlignment="Center" Text="Message @slackbot" FontFamily="Segoe UI" FontSize="18" Foreground="#FF057CC6" VerticalAlignment="Center" Padding="0,0,0,3"></TextBlock>
+                                    </Border>
+                                    <Border Tapped="UserProfileEmailBorder_Tapped" x:Name="UserProfileEmailBorder" Height="64" VerticalAlignment="Top" BorderBrush="#FFE0E0E0" BorderThickness="0,1" Margin="0,-1,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="Assets/userprofile_email_icon_128px.png" Width="22" Height="22" Margin="16,0,0,0"></Image>
+                                            <TextBlock x:Name="UserProfileEmailTextBlock" Text="email@slack.com" FontFamily="Segoe UI" FontSize="18" Foreground="#FF057CC6" VerticalAlignment="Center" Padding="0,0,0,3" Margin="16,0,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <Border x:Name="UserProfileSkypeBorder" Height="64" VerticalAlignment="Top" BorderBrush="#FFE0E0E0" BorderThickness="0,1" Margin="0,-1,0,0">
+                                        <StackPanel Orientation="Horizontal" >
+                                            <Image Source="Assets/userprofile_skype_icon_128px.png" Width="22" Height="22" Margin="16,0,0,0"></Image>
+                                            <TextBlock x:Name="UserProfileSkypeTextBlock" Text="skype name" FontFamily="Segoe UI" FontSize="18" Foreground="#FF057CC6" VerticalAlignment="Center" Padding="0,0,0,3" Margin="16,0,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Tapped="UserProfilePhoneBorder_Tapped" x:Name="UserProfilePhoneBorder" Height="64" VerticalAlignment="Top" BorderBrush="#FFE0E0E0" BorderThickness="0,1" Margin="0,-1,0,0">
+                                        <StackPanel Orientation="Horizontal" >
+                                            <Image Source="Assets/userprofile_phone_icon_128px.png" Width="22" Height="22" Margin="16,0,0,0"></Image>
+                                            <TextBlock x:Name="UserProfilePhoneTextBlock" Text="phone #" FontFamily="Segoe UI" FontSize="18" Foreground="#FF057CC6" VerticalAlignment="Center" Padding="0,0,0,3" Margin="16,0,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
                     </Grid>
                 </Border>
             </Grid>
