@@ -10,7 +10,7 @@
     d:DesignWidth="400">
     
     <Grid>
-        <ListView x:Name="UserListListView" ItemsSource="{Binding}">
+        <ListView x:Name="UserListListView" ItemsSource="{Binding Path=TeamUsersList}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -28,25 +28,50 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid Tapped="GaneralProfileLink_Tapped" Height="72" Margin="0,0,0,1" Background="#02FFFFFF" >
-                        <Border  CornerRadius="8" Width="64" Height="64" Margin="16,0,0,8" HorizontalAlignment="Left" VerticalAlignment="Center">
-                            <Border.Background>
-                                <ImageBrush Stretch="Fill" ImageSource="{Binding image_72}"/>
-                            </Border.Background>
+                        <Border x:Name="BackgroundLayer" Background="#FF00CA8C" Margin="0,1">
+                            <Grid>
+                                <Border x:Name="SwipeEmailBorder" Width="96" HorizontalAlignment="Left">
+                                    <Grid>
+                                        <Image Source="ms-appx:///Assets/userprofile_email_icon_white_128px.png" VerticalAlignment="Top" Height="30" HorizontalAlignment="Center" Margin="0,10,0,0"></Image>
+                                        <TextBlock VerticalAlignment="Bottom" FontFamily="Segoe UI" Text="EMAIL" TextAlignment="Center"></TextBlock>
+                                    </Grid>
+
+                                </Border>
+                                <Border x:Name="SwipeCallBorder" Width="96" HorizontalAlignment="Right">
+                                    <Grid>
+                                        <Image Source="ms-appx:///Assets/userprofile_skype_icon_white_128px.png" VerticalAlignment="Top" Height="30" HorizontalAlignment="Center" Margin="0,10,0,0"></Image>
+                                        <TextBlock VerticalAlignment="Bottom" FontFamily="Segoe UI" Text="CALL" TextAlignment="Center"></TextBlock>
+                                    </Grid>
+
+                                </Border>
+                            </Grid>
                         </Border>
+                        <Grid x:Name="ItemLayer" ManipulationDelta="ItemLayer_ManipulationDelta" ManipulationCompleted="ItemLayer_ManipulationCompleted"  RenderTransformOrigin="0.5,0.5" Background="White" ManipulationMode="System,TranslateX" >
+                            <Grid.RenderTransform>
+                                <CompositeTransform TranslateX="0" TranslateY="0"/>
+                            </Grid.RenderTransform>
+                            <Grid>
+                                <Border  CornerRadius="8" Width="64" Height="64" Margin="16,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    <Border.Background>
+                                        <ImageBrush Stretch="Fill" ImageSource="{Binding image_72}"/>
+                                    </Border.Background>
+                                </Border>
 
-                        <StackPanel Margin="88,0,0,0">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock   x:Name="ProfileFirstNameTextBlock" Text="{Binding RealNamewithNameFailover, Mode=TwoWay}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF222222" FontFamily="Segoe UI" FontSize="18" Height="24" Margin="0" />
-                                <Border Height="14" Width="14" CornerRadius="7" Background="{Binding Path=UserPresense}" Margin="16,5,0,0" VerticalAlignment="Center" MinWidth="0"></Border>
-                            </StackPanel>
-                            <TextBlock    x:Name="ProfileRoleTextBlock" Text="{Binding TitlewithNameFailover, Mode=OneWay}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF9B9B9B" FontFamily="Segoe UI" FontSize="16" Height="24" FontWeight="Light" Margin="0,4,0,0" />
-                        </StackPanel>
+                                <StackPanel Margin="88,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock   x:Name="ProfileFirstNameTextBlock" Text="{Binding RealNamewithNameFailover, Mode=TwoWay}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF222222" FontFamily="Segoe UI" FontSize="18" Height="24" Margin="0" />
+                                        <Border Height="14" Width="14" CornerRadius="7" Background="{Binding Path=UserPresense}" Margin="16,5,0,0" VerticalAlignment="Center" MinWidth="0"></Border>
+                                    </StackPanel>
+                                    <TextBlock    x:Name="ProfileRoleTextBlock" Text="{Binding TitlewithNameFailover, Mode=OneWay}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF9B9B9B" FontFamily="Segoe UI" FontSize="16" Height="24" FontWeight="Light" Margin="0,4,0,0" />
+                                </StackPanel>
 
-                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,6,18,0">
-                            <Image HorizontalAlignment="Right" Source="ms-appx:///Assets/userprofile_phone_icon_black_128px.png" VerticalAlignment="Top" Width="14" Height="14" Opacity="0.15" Margin="0,0,5,0" Visibility="{Binding IsPhoneAvailable}"></Image>
-                            <Image HorizontalAlignment="Right" Source="ms-appx:///Assets/userprofile_skype_icon_black_128px.png" VerticalAlignment="Top" Width="14" Height="14" Opacity="0.15" Margin="0,0,5,0" Visibility="{Binding IsSkypeAvailable}"></Image>
-                            <Image HorizontalAlignment="Right" Source="ms-appx:///Assets/userprofile_email_icon_black_128px.png" VerticalAlignment="Top" Width="14" Height="14" Opacity="0.15" Margin="0" Visibility="{Binding IsEmailAvailable}"></Image>
-                        </StackPanel>
+                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,6,18,0">
+                                    <Image HorizontalAlignment="Right" Source="ms-appx:///Assets/userprofile_phone_icon_black_128px.png" VerticalAlignment="Top" Width="14" Height="14" Opacity="0.15" Margin="0,0,5,0" Visibility="{Binding IsPhoneAvailable}"></Image>
+                                    <Image HorizontalAlignment="Right" Source="ms-appx:///Assets/userprofile_skype_icon_black_128px.png" VerticalAlignment="Top" Width="14" Height="14" Opacity="0.15" Margin="0,0,5,0" Visibility="{Binding IsSkypeAvailable}"></Image>
+                                    <Image HorizontalAlignment="Right" Source="ms-appx:///Assets/userprofile_email_icon_black_128px.png" VerticalAlignment="Top" Width="14" Height="14" Opacity="0.15" Margin="0" Visibility="{Binding IsEmailAvailable}"></Image>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

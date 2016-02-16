@@ -27,12 +27,6 @@ namespace SlackUsersList_Windows
     sealed partial class App : Application
     {
 
-        //The should be a local database storage 
-        public List<User> localuserlistcollection { get; set; }
-
-        //Global Color Values for different user statuses
-        public Dictionary<string, SolidColorBrush> usercolorstatusdict;
-
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -42,34 +36,12 @@ namespace SlackUsersList_Windows
             this.InitializeComponent();
             this.Suspending += OnSuspending;
 
-            //Setting user profile status colors when app is launched.
-            if (usercolorstatusdict == null)
-            {
-                usercolorstatusdict = new Dictionary<string, SolidColorBrush>();
-                usercolorstatusdict.Add("all", new SolidColorBrush(Color.FromArgb(255, 224, 224, 224)));
-                usercolorstatusdict.Add("away", new SolidColorBrush(Color.FromArgb(255, 224, 224, 224)));
-                usercolorstatusdict.Add("admin", new SolidColorBrush(Color.FromArgb(255, 255, 196, 32)));
-                usercolorstatusdict.Add("owner", new SolidColorBrush(Color.FromArgb(255, 255, 128, 64)));
-                usercolorstatusdict.Add("bots", new SolidColorBrush(Color.FromArgb(255, 64, 196, 255)));
-                usercolorstatusdict.Add("deleted", new SolidColorBrush(Color.FromArgb(255, 255, 64, 64)));
-                usercolorstatusdict.Add("active", new SolidColorBrush(Color.FromArgb(255, 64, 224, 128)));
-            }
+            
         }
 
         protected override void OnActivated(IActivatedEventArgs args)
         {
-            //Setting user profile status colors when app is reactivated.
-            if (usercolorstatusdict == null)
-            {
-                usercolorstatusdict = new Dictionary<string, SolidColorBrush>();
-                usercolorstatusdict.Add("all", new SolidColorBrush(Color.FromArgb(255, 224, 224, 224)));
-                usercolorstatusdict.Add("away", new SolidColorBrush(Color.FromArgb(255, 224, 224, 224)));
-                usercolorstatusdict.Add("admin", new SolidColorBrush(Color.FromArgb(255, 255, 196, 32)));
-                usercolorstatusdict.Add("owner", new SolidColorBrush(Color.FromArgb(255, 255, 128, 64)));
-                usercolorstatusdict.Add("bots", new SolidColorBrush(Color.FromArgb(255, 64, 196, 255)));
-                usercolorstatusdict.Add("deleted", new SolidColorBrush(Color.FromArgb(255, 255, 64, 64)));
-                usercolorstatusdict.Add("active", new SolidColorBrush(Color.FromArgb(255, 64, 224, 128)));
-            }
+           
         }
 
         /// <summary>

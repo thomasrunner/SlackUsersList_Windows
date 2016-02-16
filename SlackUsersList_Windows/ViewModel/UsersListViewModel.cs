@@ -19,33 +19,128 @@ using System.Net.Http;
 using System.IO;
 using System.Net;
 using SlackUsersList.SlackAPI;
-using SlackUsersList_Windows;
+using System.ComponentModel;
 
 /// <summary>
 /// This ViewModel uses the User Model and UsersListView View
 /// Responsibilities is to Connect to App SlackAPI layer, parse the JSON results and build List of Users to be presented.
 /// </summary> 
-namespace SlackUsersList.ViewModel
+namespace SlackUsersList_Windows.ViewModel
 {
-     public class UsersListViewModel 
-     {
-        //Specific file for this object
+    public class UsersListViewModel : INotifyPropertyChanged
+    {
         static string USERLISTFILENAME = "users.json";
-        public List<User> UsersList {get; set;}
-       
-        /// <summary>
-        /// Only public function to populate the user list, with the option to check locally (if exists) otherwise a fresh copy is pulled from Slack.
-        /// </summary>
-        /// <param name="trylocalcopy"></param>
-        /// <returns></returns>
-        public async Task PopulateUsers(bool trylocalcopy)
+
+        private List<User> teamfulllist;
+        private List<User> teamlist;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+
+        public List<User> TeamUsersList
         {
-            if (trylocalcopy == true)
+            get { return teamlist; }
+        }
+
+        //select a specific user from existing selected user list
+        public User SelectTeamUser(string userid)
+        {
+            if (userid == "") return null;
+            return new List<User>(teamlist.Where(x => x.id == userid))[0];
+        }
+
+        //filter team list
+        public void FilterTeamList(string filtername)
+        {
+            filtername = filtername.ToLower();
+            if (filtername == "all")
+            {
+                teamlist = new List<User>(teamfulllist);
+            }
+            else if (filtername == "admin")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.is_admin == true).ToList());
+            }
+            else if (filtername == "owner")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.is_owner == true).ToList());
+            }
+            else if (filtername == "active")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.presence != "away").ToList());
+            }
+            else if (filtername == "bots")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.IsSlackBot == true).ToList());
+            }
+            else if (filtername == "deleted")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.deleted == true).ToList());
+            }
+            else if (filtername == "away")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.presence == "away").ToList());
+            }
+
+            //Update UI with changes
+            OnPropertyChanged("TeamUsersList");
+
+        }
+
+        // search for team member(s)
+        public void SearchTeamList(string searchstring)
+        {
+            searchstring = searchstring.ToLower();
+            if (searchstring == "all")
+            {
+                teamlist = new List<User>(teamfulllist);
+            }
+            else if (searchstring == "admin")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.is_admin == true).ToList());
+            }
+            else if (searchstring == "owner")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.is_owner == true).ToList());
+            }
+            else if (searchstring == "active")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.presence != "away").ToList());
+            }
+            else if (searchstring == "bots")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.IsSlackBot == true).ToList());
+            }
+            else if (searchstring == "deleted")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.deleted == true).ToList());
+            }
+            else if (searchstring == "away")
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.presence == "away").ToList());
+            }
+            else if (searchstring.Trim().Length > 0)
+            {
+                teamlist = new List<User>(teamfulllist.Where(x => x.name.ToLower().StartsWith(searchstring.ToLower()) || x.profile.first_name.ToLower().StartsWith(searchstring.ToLower()) || x.profile.title.ToLower().StartsWith(searchstring.ToLower())).ToList());
+            }
+            else
+            {
+                teamlist = new List<User>(teamfulllist);
+            }
+
+            //Update UI with changes
+            OnPropertyChanged("TeamUsersList");
+        }
+
+        /// public function to populate the user list, with the option to check locally (if exists) otherwise a fresh copy is pulled from Slack.
+        public async Task PopulateUsers(bool loadlocalcopy)
+        {
+            if (loadlocalcopy == true)
             {
                 StorageFolder local = Windows.Storage.ApplicationData.Current.LocalFolder;
                 bool isFile = await FileExists(local, USERLISTFILENAME);
-                
-                if(isFile == true)
+
+                if (isFile == true)
                 {
                     String savedjsonstring = await readJSONStringFromLocalFile(USERLISTFILENAME);
                     ParseJSONStringData(savedjsonstring);
@@ -55,7 +150,7 @@ namespace SlackUsersList.ViewModel
             {
                 await DownloadData();
 
-                if (UsersList == null)
+                if (teamlist == null)
                 {
                     StorageFolder local = Windows.Storage.ApplicationData.Current.LocalFolder;
                     bool isFile = await FileExists(local, USERLISTFILENAME);
@@ -71,12 +166,7 @@ namespace SlackUsersList.ViewModel
             return;
         }
 
-        /// <summary>
         /// Checks if the file exists before trying to load it.
-        /// </summary>
-        /// <param name="folder"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
         private static async Task<bool> FileExists(StorageFolder folder, string fileName)
         {
             try { StorageFile file = await folder.GetFileAsync(fileName); }
@@ -84,20 +174,16 @@ namespace SlackUsersList.ViewModel
             return true;
         }
 
-        /// <summary>
         /// This is the specific download request for the user list from Slack and saves it to the load storage for quick reloading if internet is not available, Ideally this is would have been stored in database
-        /// </summary>
-        /// <returns></returns>
         private async Task DownloadData()
         {
             SlackAPIRequests slackapirequests = new SlackAPIRequests();
             slackapirequests.AddUrlParameter("presence", "1");
 
             //In a more complete solution I would put token as part of a logged in User Security Class, this allows for easier profile switching and portability as it can also be saved in the 
-            //users roaming profile for Windows 8.1/10 or other Windows Phones.
-
+            //users roaming profile for Windows 8.1/10 or other Windows Phones. HERE IS JUST A SAMPLE TOKEN JUST REPLACE WITH YOUR OWN TEAMS TOKEN TO PLAY WITH
             String contentstring = await slackapirequests.SlackAPIRequest("xoxp-5048173296-5048487710-19045732087-b5427e3b46", "https://slack.com/api/users.list");
-            //xoxp-5048173296-5048487710-19045732087-b5427e3b46
+
             if (contentstring.StartsWith("Error: No ") == false && contentstring.StartsWith("Connection Error: ") == false)
             {
                 ParseJSONStringData(contentstring);
@@ -108,10 +194,7 @@ namespace SlackUsersList.ViewModel
             }
         }
 
-        /// <summary>
         /// Parse the JSON string for this specific class and populated UsersList List
-        /// </summary>
-        /// <param name="jsonstring"></param>
         private async void ParseJSONStringData(string jsonstring)
         {
             //Some values can be either "" or null
@@ -183,85 +266,84 @@ namespace SlackUsersList.ViewModel
                             }
                         }
 
-                            //User Profile Class which is a subclass of User
-                            UserProfile newmemberprofile = new UserProfile();
-                            JToken profilejtoken = member.SelectToken("profile");
+                        //User Profile Class which is a subclass of User
+                        UserProfile newmemberprofile = new UserProfile();
+                        JToken profilejtoken = member.SelectToken("profile");
 
-                            if (profilejtoken.SelectToken("first_name") != null)
-                            {
-                                newmemberprofile.first_name = profilejtoken.SelectToken("first_name").ToString();
-                            }
+                        if (profilejtoken.SelectToken("first_name") != null)
+                        {
+                            newmemberprofile.first_name = profilejtoken.SelectToken("first_name").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("last_name") != null)
-                            {
-                                newmemberprofile.last_name = profilejtoken.SelectToken("last_name").ToString();
-                            }
+                        if (profilejtoken.SelectToken("last_name") != null)
+                        {
+                            newmemberprofile.last_name = profilejtoken.SelectToken("last_name").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("real_name") != null)
-                            {
-                                newmemberprofile.real_name = profilejtoken.SelectToken("real_name").ToString();
-                            }
+                        if (profilejtoken.SelectToken("real_name") != null)
+                        {
+                            newmemberprofile.real_name = profilejtoken.SelectToken("real_name").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("title") != null)
-                            {
-                                newmemberprofile.title = profilejtoken.SelectToken("title").ToString();
-                            }
+                        if (profilejtoken.SelectToken("title") != null)
+                        {
+                            newmemberprofile.title = profilejtoken.SelectToken("title").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("email") != null)
-                            {
-                                newmemberprofile.email = profilejtoken.SelectToken("email").ToString();
-                            }
+                        if (profilejtoken.SelectToken("email") != null)
+                        {
+                            newmemberprofile.email = profilejtoken.SelectToken("email").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("skype") != null)
-                            {
-                                newmemberprofile.skype = profilejtoken.SelectToken("skype").ToString();
-                            }
+                        if (profilejtoken.SelectToken("skype") != null)
+                        {
+                            newmemberprofile.skype = profilejtoken.SelectToken("skype").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("phone") != null)
-                            {
-                                newmemberprofile.phone = profilejtoken.SelectToken("phone").ToString();
-                            }
+                        if (profilejtoken.SelectToken("phone") != null)
+                        {
+                            newmemberprofile.phone = profilejtoken.SelectToken("phone").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("image_24") != null)
-                            {
-                                newmemberprofile.image_24 = profilejtoken.SelectToken("image_24").ToString();
-                            }
+                        if (profilejtoken.SelectToken("image_24") != null)
+                        {
+                            newmemberprofile.image_24 = profilejtoken.SelectToken("image_24").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("image_32") != null)
-                            {
-                                newmemberprofile.image_32 = profilejtoken.SelectToken("image_32").ToString();
-                            }
+                        if (profilejtoken.SelectToken("image_32") != null)
+                        {
+                            newmemberprofile.image_32 = profilejtoken.SelectToken("image_32").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("image_48") != null)
-                            {
-                                newmemberprofile.image_48 = profilejtoken.SelectToken("image_48").ToString();
-                            }
+                        if (profilejtoken.SelectToken("image_48") != null)
+                        {
+                            newmemberprofile.image_48 = profilejtoken.SelectToken("image_48").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("image_72") != null)
-                            {
-                                newmemberprofile.image_72 = profilejtoken.SelectToken("image_72").ToString();
-                            }
+                        if (profilejtoken.SelectToken("image_72") != null)
+                        {
+                            newmemberprofile.image_72 = profilejtoken.SelectToken("image_72").ToString();
+                        }
 
-                            if (profilejtoken.SelectToken("image_192") != null)
-                            {
-                                newmemberprofile.image_192 = profilejtoken.SelectToken("image_192").ToString();
-                            }
+                        if (profilejtoken.SelectToken("image_192") != null)
+                        {
+                            newmemberprofile.image_192 = profilejtoken.SelectToken("image_192").ToString();
+                        }
 
-                            newmember.profile = newmemberprofile;
-                        
+                        newmember.profile = newmemberprofile;
+
                         a.Add(newmember);
 
                     }
 
-                    UsersList = a;
+                    teamlist = a;
 
-                    //If local Database was used this would not be necessary
-                    (App.Current as App).localuserlistcollection = a;
+                    teamfulllist = a;
 
                     //Save Good Parsable results only
-                    if (UsersList != null)
+                    if (teamlist != null)
                     {
-                        if (UsersList.Count > 0)
+                        if (teamlist.Count > 0)
                         {
                             await saveJSONStringToLocalFile(USERLISTFILENAME, jsonstring);
                         }
@@ -274,32 +356,23 @@ namespace SlackUsersList.ViewModel
             }
         }
 
-        /// <summary>
         /// Saves the valid JSON string response to the local storage
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <param name="content"></param>
-        /// <returns></returns>
         private async Task saveJSONStringToLocalFile(string filename, string jsonstring)
         {
-            // saves the string 'jsonstring' to a file 'filename' in the app's local storage folder
+            // Saves the string 'jsonstring' to a file 'filename' in the app's local storage folder
             byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(jsonstring.ToCharArray());
 
-            // create a file with the given filename in the local folder; replace any existing file with the same name
+            // Create a file with the given filename in the local folder; replace any existing file with the same name
             StorageFile file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
 
-            // write the char array created from the content string into the file
+            // Write the char array created from the content string into the file
             using (var stream = await file.OpenStreamForWriteAsync())
             {
                 stream.Write(fileBytes, 0, fileBytes.Length);
             }
         }
 
-        /// <summary>
         /// Reads the locally JSON string copy of users.list response for parsing
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <returns></returns>
         private static async Task<string> readJSONStringFromLocalFile(string filename)
         {
             // reads the contents of file 'filename' in the app's local storage folder and returns it as a string
@@ -318,5 +391,16 @@ namespace SlackUsersList.ViewModel
 
             return jsonstring;
         }
+
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
     }
 }

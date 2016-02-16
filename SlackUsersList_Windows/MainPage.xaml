@@ -7,7 +7,7 @@
     xmlns:local="using:SlackUsersList_Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Loaded="Page_Loaded">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Border Background="White">
@@ -15,7 +15,7 @@
                 <Border HorizontalAlignment="Left" Width="260" Background="#FF4D394B">
                     <Grid>
                         <Border Height="60" VerticalAlignment="Top" Background="#FF3E313C">
-                            <TextBlock VerticalAlignment="Center" Text="Slack Team" Foreground="White" FontFamily="Segoe UI" FontSize="22" TextAlignment="Center" Padding="0" Margin="0,0,0,4" TextWrapping="Wrap" FontWeight="SemiBold" />
+                            <TextBlock VerticalAlignment="Center" Text="Generic Team Data" Foreground="White" FontFamily="Segoe UI" FontSize="22" TextAlignment="Center" Padding="0" Margin="0,0,0,4" TextWrapping="Wrap" FontWeight="SemiBold" />
 
                         </Border>
 
@@ -60,7 +60,7 @@
                             <TextBox x:Name="UserSearchTextBox" LostFocus="UserSearchTextBox_LostFocus" GotFocus="UserSearchTextBox_GotFocus"  KeyUp="UserSearchTextBox_KeyUp"  Text="search (name, firstname or role)" Padding="15,12,8,0"  FontSize="18" FontFamily="Segoe UI" VerticalAlignment="Stretch" BorderThickness="0" BorderBrush="{x:Null}" Background="{x:Null}" Margin="0,-1,0.167,0" Foreground="#FF404040" />
                         </Border>
 
-                        <userslistview:UsersListView x:Name="UsersListLiveView" SelectedUserListViewItem="UsersListLiveView_SelectedUserListViewItem" Margin="0,136,0,0" Background="Black" HorizontalContentAlignment="Stretch"  />
+                        <userslistview:UsersListView x:Name="UsersListLiveView" SwipeEmailUser="UsersListLiveView_SwipeEmailUser" SwipeCallUser="UsersListLiveView_SwipeCallUser" SelectedUserListViewItem="UsersListLiveView_SelectedUserListViewItem" Margin="0,136,0,0" Background="Black" HorizontalContentAlignment="Stretch"  />
 
                         <StackPanel x:Name="RightPanelUserStatusTypeListBorder" Background="#FFF0F0F0" Width="140" HorizontalAlignment="Right" Visibility="Collapsed">
                             <Border Tapped="RightPanelUserStatusTypeStackItem_Tapped" x:Name="RightPanelStatusTypeItemAllBorder"   HorizontalAlignment="Right" Width="140" Height="63" Background="#FFF0F0F0">
@@ -129,7 +129,7 @@
                             </Grid>
                         </Border>
 
-                        <ProgressRing Foreground="#FF53AACA" Width="32" HorizontalAlignment="Center" Height="32" IsActive="True" Background="{x:Null}" VerticalAlignment="Top" Margin="0,128,0,0"></ProgressRing>
+                        <ProgressRing Foreground="#FF00CA8C" Width="32" HorizontalAlignment="Center" Height="32" IsActive="True" Background="{x:Null}" VerticalAlignment="Top" Margin="0,128,0,0"></ProgressRing>
                         <Border x:Name="UserProfilePhotoBorder"  CornerRadius="8" Width="128" Height="128" Margin="0,96,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" BorderThickness="1">
                             <Border.Background>
                                 <ImageBrush Stretch="Fill"/>

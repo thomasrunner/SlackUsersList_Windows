@@ -1,4 +1,5 @@
-﻿using SlackUsersList.ViewModel;
+﻿using SlackUsersList_Windows;
+using SlackUsersList_Windows.ViewModel;
 using SlackUsersList_Windows.Model;
 using System;
 using System.Collections.Generic;
@@ -24,8 +25,9 @@ namespace SlackUsersList_Windows
 {
     public sealed partial class MainPage : Page
     {
-        private UsersListViewModel userviewmodel;
+        private UsersListViewModel teamuserlist;
         private User selecteduser;
+        private SlackConstants slackconstants;
 
         public MainPage()
         {
@@ -33,35 +35,25 @@ namespace SlackUsersList_Windows
 
             this.NavigationCacheMode = NavigationCacheMode.Required;
 
-            userviewmodel = new UsersListViewModel();
+            teamuserlist = new UsersListViewModel();
+            slackconstants = new SlackConstants();
 
-            //These are the little color indicator in the Right Panel which appears when clicking the top right side user status button.
-            RightPanelAdminTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["admin"];
-            RightPanelOwnerTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["owner"];
-            RightPanelActiveStatusBorder.Background = (App.Current as App).usercolorstatusdict["active"];
-            RightPanelBotStatusBorder.Background = (App.Current as App).usercolorstatusdict["bots"];
-            RightPanelDeletedStatusBorder.Background = (App.Current as App).usercolorstatusdict["deleted"];
-            RightPanelAwayStatusBorder.Background = (App.Current as App).usercolorstatusdict["away"];
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            //If the page has no data try downloading
-            if (UsersListLiveView.DataContext == null)
-            {
-                await userviewmodel.PopulateUsers(false);
 
-                UsersListLiveView.DataContext = userviewmodel.UsersList;
-            }
+            //These are the little color indicator in the Right Panel which appears when clicking the top right side user status button.
+            RightPanelAdminTypeStatusBorder.Background = slackconstants.getColor("admin");
+            RightPanelOwnerTypeStatusBorder.Background = slackconstants.getColor("owner");
+            RightPanelActiveStatusBorder.Background = slackconstants.getColor("active");
+            RightPanelBotStatusBorder.Background = slackconstants.getColor("bots");
+            RightPanelDeletedStatusBorder.Background = slackconstants.getColor("deleted");
+            RightPanelAwayStatusBorder.Background = slackconstants.getColor("away");
 
             RightPanelUserStatusTypeListBorder.Visibility = Visibility.Collapsed;
 
-            //Hides the StatusBar
-            //await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
-
-            //Hardware Back Button
-            //HardwareButtons.BackPressed += OnBackButton;
-
+            
             //Network Connection Check
             bool hasNetworkConnection = NetworkInterface.GetIsNetworkAvailable();
 
@@ -76,122 +68,104 @@ namespace SlackUsersList_Windows
                 await messageDialog.ShowAsync();
             }
 
-            //This is just a data page filler and should use the loggedin user account in a more complete solution.
-            if((App.Current as App).localuserlistcollection != null)
+            
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            //If the page has no data try downloading
+            if (UsersListLiveView.DataContext == null)
             {
-                if((App.Current as App).localuserlistcollection.Count > 0)
+                //This async but do not block the page loading
+                await teamuserlist.PopulateUsers(false);
+
+                UsersListLiveView.DataContext = teamuserlist;
+            }
+
+            //This is just a data page filler and should use the loggedin user account in a more complete solution.
+            if (teamuserlist != null)
+            {
+
+                User user = new List<User>(teamuserlist.TeamUsersList.Where(x => x.is_admin == true || x.is_owner == true))[0];
+
+                MainPanelProfileNameTextBlock.Text = user.NamewithAtSymbol;
+
+                MainPanelProfileStatusIndicatorBorder.Background = user.UserPresenceExcludingAwayStatusColor;
+                if (user.presence == "away")
                 {
-                    User user = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.is_admin == true || x.is_owner == true))[0];
-
-                    MainPanelProfileNameTextBlock.Text = user.NamewithAtSymbol;
-
-                    MainPanelProfileStatusIndicatorBorder.Background = user.UserPresenceExcludingAwayStatusColor;
-                    if(user.presence == "away")
-                    {
-                        MainPanelProfileStatusTextBlock.Text = "away";
-                    }
-                    ImageBrush imagebrush = new ImageBrush();
-                    imagebrush.ImageSource = user.image_192;
-                    MainPanelProfilePhotoBorder.Background = imagebrush;
+                    MainPanelProfileStatusTextBlock.Text = "away";
                 }
+                ImageBrush imagebrush = new ImageBrush();
+                imagebrush.ImageSource = user.image_192;
+                MainPanelProfilePhotoBorder.Background = imagebrush;
             }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             RightPanelUserStatusTypeListBorder.Visibility = Visibility.Collapsed;
-            //HardwareButtons.BackPressed -= OnBackButton;
+            
         }
 
-        //private void OnBackButton(object sender, BackPressedEventArgs e)
-        //{
-        //    if (RightPanelUserStatusTypeListBorder.Visibility == Visibility.Visible)
-        //    {
-        //        RightPanelUserStatusTypeListBorder.Visibility = Visibility.Collapsed;
-        //        e.Handled = true;
-        //        return;
-        //    }
-
-        //    e.Handled = false;
-        //}
-
-        /// <summary>
         /// This allows users to search a specific user by both profile name and first name as well as use some key words to quick filter large list
         /// KEY WORDS (admin, away, owner, bots, active, deleted, "" = all)
         /// ADDITION KEY WORDS (marketing, android, ios, customer, ceo, cfo, cto, wp, server, etc...) <- Excellent for larger teams
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void UserSearchTextBox_KeyUp(object sender, KeyRoutedEventArgs e)
         {
-            if ((App.Current as App).localuserlistcollection == null) return;
-            if ((App.Current as App).localuserlistcollection.Count == 0) return;
-
             TextBox usersearchtextbox = (TextBox)sender;
-            String namesearch = usersearchtextbox.Text.ToLower();
+            String searchstring = usersearchtextbox.Text.ToLower();
 
-            if (namesearch == "admin")
+            teamuserlist.SearchTeamList(searchstring);
+
+            //Update UI to reflect changes.
+            if (searchstring == "admin")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.is_admin == true).ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["admin"];
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("admin");
                 TitleMemberListTypeTextBlock.Text = "Admin";
             }
-            else if (namesearch == "owner")
+            else if (searchstring == "owner")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.is_owner == true).ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["owner"];
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("owner");
                 TitleMemberListTypeTextBlock.Text = "Owner";
             }
-            else if (namesearch == "bots")
+            else if (searchstring == "bots")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.IsSlackBot == true).ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["bots"];
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("bots");
                 TitleMemberListTypeTextBlock.Text = "Bots";
             }
-            else if (namesearch == "active")
+            else if (searchstring == "active")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.presence != "away").ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["active"];
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("active");
                 TitleMemberListTypeTextBlock.Text = "Active";
             }
-            else if (namesearch == "deleted")
+            else if (searchstring == "deleted")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.deleted == true).ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["deleted"];
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("deleted");
                 TitleMemberListTypeTextBlock.Text = "Deleted";
             }
-            else if (namesearch == "all")
+            else if (searchstring == "all")
             {
-                userviewmodel.UsersList = (App.Current as App).localuserlistcollection;
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["all"];
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
                 TitleMemberListTypeTextBlock.Text = "All";
             }
-            else if (namesearch == "away")
+            else if (searchstring == "away")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.presence == "away")).ToList();
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["away"];
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("away");
                 TitleMemberListTypeTextBlock.Text = "Away";
             }
-            else if (namesearch.Trim().Length > 0)
+            else if (searchstring.Trim().Length > 0)
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.name.ToLower().StartsWith(namesearch.ToLower()) || x.profile.first_name.ToLower().StartsWith(namesearch.ToLower()) || x.profile.title.ToLower().StartsWith(namesearch.ToLower())).ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["all"];
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
                 TitleMemberListTypeTextBlock.Text = "All";
             }
             else
             {
-                userviewmodel.UsersList = (App.Current as App).localuserlistcollection;
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["all"];
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
                 TitleMemberListTypeTextBlock.Text = "All";
             }
-            UsersListLiveView.DataContext = userviewmodel.UsersList;
         }
 
-        /// <summary>
         /// Placeholder Function to help users understand this is a search field.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void UserSearchTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if (UserSearchTextBox.Text == "search (name, firstname or role)")
@@ -209,101 +183,88 @@ namespace SlackUsersList_Windows
             }
         }
 
-        /// <summary>
-        /// These 2 functions are just a fun colourful addition for users to filter based on user status. This shows the menu
+        /// These next 2 functions are just a fun colourful addition for users to filter based on user status. This shows the menu
         /// and when a stack item is selected I used the item name to apply the search as well as teach user some keyword search tricks
         /// by putting the word into the search box, subtle but very effective over time.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void TitleStatusTypeButtonBorder_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if ((App.Current as App).localuserlistcollection == null) return;
-            if ((App.Current as App).localuserlistcollection.Count == 0) return;
             RightPanelUserStatusTypeListBorder.Visibility = Visibility.Visible;
         }
 
         private void RightPanelUserStatusTypeStackItem_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if ((App.Current as App).localuserlistcollection == null) return;
-            if ((App.Current as App).localuserlistcollection.Count == 0) return;
-
             Border StatusTypeItem = (Border)sender;
             if (StatusTypeItem.Name == "RightPanelStatusTypeItemAllBorder")
             {
-                userviewmodel.UsersList = (App.Current as App).localuserlistcollection;
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["all"];
+                teamuserlist.FilterTeamList("all");
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
                 TitleMemberListTypeTextBlock.Text = "All";
                 UserSearchTextBox.Text = "all";
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemAdminBorder")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.is_admin == true).ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["admin"];
+                teamuserlist.FilterTeamList("admin");
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("admin");
                 TitleMemberListTypeTextBlock.Text = "Admin";
                 UserSearchTextBox.Text = "admin";
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemOwnerBorder")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.is_owner == true).ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["owner"];
+                teamuserlist.FilterTeamList("owner");
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("owner");
                 TitleMemberListTypeTextBlock.Text = "Owner";
                 UserSearchTextBox.Text = "owner";
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemActiveBorder")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.presence != "away").ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["active"];
+                teamuserlist.FilterTeamList("active");
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("active");
                 TitleMemberListTypeTextBlock.Text = "Active";
                 UserSearchTextBox.Text = "active";
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemBotsBorder")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.IsSlackBot == true).ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["bots"];
+                teamuserlist.FilterTeamList("bots");
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("bots");
                 TitleMemberListTypeTextBlock.Text = "Bots";
                 UserSearchTextBox.Text = "bots";
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemDeletedBorder")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.deleted == true).ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["deleted"];
+                teamuserlist.FilterTeamList("deleted");
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("deleted");
                 TitleMemberListTypeTextBlock.Text = "Deleted";
                 UserSearchTextBox.Text = "deleted";
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemAwayBorder")
             {
-                userviewmodel.UsersList = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.presence == "away").ToList());
-                TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["away"];
+                teamuserlist.FilterTeamList("away");
+                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("away");
                 TitleMemberListTypeTextBlock.Text = "Away";
                 UserSearchTextBox.Text = "away";
             }
 
             RightPanelUserStatusTypeListBorder.Visibility = Visibility.Collapsed;
-            UsersListLiveView.DataContext = userviewmodel.UsersList;
         }
 
-        /// <summary>
         /// This is just a simple refresh button to force downloading of fresh data.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private async void ReloadUserListBorder_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            //Resets the search UI elements
-            UserSearchTextBox.Text = "search (name, firstname or role)";
-            TitleMemberListTypeStatusBorder.Background = (App.Current as App).usercolorstatusdict["all"];
-            TitleMemberListTypeTextBlock.Text = "All";
-            UserSearchTextBox.Text = "search (name, firstname or role)";
-
-            //No Network Connections
+            //Network Connections Check
             bool hasNetworkConnection = NetworkInterface.GetIsNetworkAvailable();
 
             if (hasNetworkConnection == true)
             {
-                await userviewmodel.PopulateUsers(false);
-                UsersListLiveView.DataContext = userviewmodel.UsersList;
+                await teamuserlist.PopulateUsers(false);
+                UsersListLiveView.DataContext = teamuserlist;
+                teamuserlist.FilterTeamList("all");
+                
             }
+
+            //Resets the search UI elements
+            TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
+            TitleMemberListTypeTextBlock.Text = "All";
+            UserSearchTextBox.Text = "search (name, firstname or role)";
         }
 
         private void UserProfilePhoneBorder_Tapped(object sender, TappedRoutedEventArgs e)
@@ -311,11 +272,7 @@ namespace SlackUsersList_Windows
             //Add Code to Launch Phone in UWA
         }
 
-        /// <summary>
         /// Launches email app with email of selected user. This option is only visible if the selected user has an email address
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private async void UserProfileEmailBorder_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if(selecteduser != null)
@@ -331,15 +288,37 @@ namespace SlackUsersList_Windows
         }
 
 
-        /// <summary>
+        // This event gets called when swiping item to the left
+        async void UsersListLiveView_SwipeCallUser(object sender, EventArgs e)
+        {
+            User user = teamuserlist.SelectTeamUser(UsersListLiveView.SelectUserID);
+
+            if (user == null) return;
+            if (user.profile.skype == "") return;
+
+            //launch skype
+            var skypeto = new Uri("skype:" + user.profile.skype + "?call");
+            await Windows.System.Launcher.LaunchUriAsync(skypeto);
+
+        }
+
+        // This even gets called when swiping item to the right
+        async void UsersListLiveView_SwipeEmailUser(object sender, EventArgs e)
+        {
+            User user = teamuserlist.SelectTeamUser(UsersListLiveView.SelectUserID);
+
+            if (user == null) return;
+            if (user.profile.email == "") return;
+
+            var mailto = new Uri("mailto:" + user.profile.email);
+            await Windows.System.Launcher.LaunchUriAsync(mailto);
+        }
+
         /// This event gets triggered when an item is selected from the UsersListView View ListView.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private async void UsersListLiveView_SelectedUserListViewItem(object sender, EventArgs e)
         {
             //Ideally this should be some sort of local database
-            selecteduser = new List<User>((App.Current as App).localuserlistcollection.Where(x => x.id == UsersListLiveView.SelectUserID))[0];
+            selecteduser = teamuserlist.SelectTeamUser(UsersListLiveView.SelectUserID);
 
             if (selecteduser == null) return;
 
@@ -439,5 +418,7 @@ namespace SlackUsersList_Windows
         {
             UserProfileBorder.Visibility = Visibility.Collapsed;
         }
+
+        
     }
 }

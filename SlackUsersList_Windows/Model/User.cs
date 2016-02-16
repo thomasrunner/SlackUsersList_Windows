@@ -21,6 +21,7 @@ namespace SlackUsersList_Windows.Model
 {
     public class User
     {
+        private SlackConstants slackconstants = new SlackConstants();
 
         public string id { get; set; }
 
@@ -286,9 +287,7 @@ namespace SlackUsersList_Windows.Model
             }
         }
 
-        /// <summary>
         /// Nice little visual indicator to show the different types of users and the user status
-        /// </summary>
         public SolidColorBrush UserPresense
         {
             get
@@ -297,36 +296,35 @@ namespace SlackUsersList_Windows.Model
                 {
                     if (presence == "away")
                     {
-                        return (App.Current as App).usercolorstatusdict["away"];
+                        return slackconstants.getColor("away");
                     }
                     else if (is_admin == true)
                     {
-                        return (App.Current as App).usercolorstatusdict["admin"];
+                        return slackconstants.getColor("admin");
                     }
                     else if (is_owner == true)
                     {
-                        return (App.Current as App).usercolorstatusdict["owner"];
+                        return slackconstants.getColor("owner");
                     }
                     else if (IsSlackBot == true)
                     {
-                        return (App.Current as App).usercolorstatusdict["bots"];
+                        return slackconstants.getColor("bots");
                     }
                     else
                     {
-                        return (App.Current as App).usercolorstatusdict["active"];
+                        return slackconstants.getColor("active");
                     }
                 }
                 else
                 {
-                    return (App.Current as App).usercolorstatusdict["deleted"];
+                    return slackconstants.getColor("deleted");
                 }
 
             }
         }
 
-        /// <summary>
+
         /// Nice little visual indicator to show the different types of users and the user status, specific for user profile
-        /// </summary>
         public SolidColorBrush UserPresenceExcludingAwayStatusColor
         {
             get
@@ -335,24 +333,24 @@ namespace SlackUsersList_Windows.Model
                 {
                     if (is_admin == true)
                     {
-                        return (App.Current as App).usercolorstatusdict["admin"];
+                        return slackconstants.getColor("admin");
                     }
                     else if (is_owner == true)
                     {
-                        return (App.Current as App).usercolorstatusdict["owner"];
+                        return slackconstants.getColor("owner");
                     }
                     else if (IsSlackBot == true)
                     {
-                        return (App.Current as App).usercolorstatusdict["bots"];
+                        return slackconstants.getColor("bots");
                     }
                     else
                     {
-                        return (App.Current as App).usercolorstatusdict["active"];
+                        return slackconstants.getColor("active");
                     }
                 }
                 else
                 {
-                    return (App.Current as App).usercolorstatusdict["deleted"];
+                    return slackconstants.getColor("deleted");
                 }
 
             }
