@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using SlackUsersList_Windows.Extensions;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -27,7 +28,6 @@ namespace SlackUsersList_Windows
     {
         private UsersListViewModel teamuserlist;
         private User selecteduser;
-        private SlackConstants slackconstants;
 
         public MainPage()
         {
@@ -36,7 +36,6 @@ namespace SlackUsersList_Windows
             this.NavigationCacheMode = NavigationCacheMode.Required;
 
             teamuserlist = new UsersListViewModel();
-            slackconstants = new SlackConstants();
 
         }
 
@@ -44,12 +43,12 @@ namespace SlackUsersList_Windows
         {
 
             //These are the little color indicator in the Right Panel which appears when clicking the top right side user status button.
-            RightPanelAdminTypeStatusBorder.Background = slackconstants.getColor("admin");
-            RightPanelOwnerTypeStatusBorder.Background = slackconstants.getColor("owner");
-            RightPanelActiveStatusBorder.Background = slackconstants.getColor("active");
-            RightPanelBotStatusBorder.Background = slackconstants.getColor("bots");
-            RightPanelDeletedStatusBorder.Background = slackconstants.getColor("deleted");
-            RightPanelAwayStatusBorder.Background = slackconstants.getColor("away");
+            RightPanelAdminTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ADMINSTATUS);
+            RightPanelOwnerTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.OWNERSTATUS);
+            RightPanelActiveStatusBorder.Background = SlackConstants.getColor(SlackConstants.ACTIVESTATUS);
+            RightPanelBotStatusBorder.Background = SlackConstants.getColor(SlackConstants.BOTSSTATUS);
+            RightPanelDeletedStatusBorder.Background = SlackConstants.getColor(SlackConstants.DELETEDSTATUS);
+            RightPanelAwayStatusBorder.Background = SlackConstants.getColor(SlackConstants.AWAYSTATUS);
 
             RightPanelUserStatusTypeListBorder.Visibility = Visibility.Collapsed;
 
@@ -91,9 +90,9 @@ namespace SlackUsersList_Windows
                 MainPanelProfileNameTextBlock.Text = user.NamewithAtSymbol;
 
                 MainPanelProfileStatusIndicatorBorder.Background = user.UserPresenceExcludingAwayStatusColor;
-                if (user.presence == "away")
+                if (user.presence == SlackConstants.AWAYSTATUS)
                 {
-                    MainPanelProfileStatusTextBlock.Text = "away";
+                    MainPanelProfileStatusTextBlock.Text = SlackConstants.AWAYSTATUS.CapitalizeFirstLetter();
                 }
                 ImageBrush imagebrush = new ImageBrush();
                 imagebrush.ImageSource = user.image_192;
@@ -118,50 +117,50 @@ namespace SlackUsersList_Windows
             teamuserlist.SearchTeamList(searchstring);
 
             //Update UI to reflect changes.
-            if (searchstring == "admin")
+            if (searchstring == SlackConstants.ADMINSTATUS)
             {
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("admin");
-                TitleMemberListTypeTextBlock.Text = "Admin";
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ADMINSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.ADMINSTATUS.CapitalizeFirstLetter();
             }
-            else if (searchstring == "owner")
+            else if (searchstring == SlackConstants.OWNERSTATUS)
             {
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("owner");
-                TitleMemberListTypeTextBlock.Text = "Owner";
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.OWNERSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.OWNERSTATUS.CapitalizeFirstLetter();
             }
-            else if (searchstring == "bots")
+            else if (searchstring == SlackConstants.BOTSSTATUS)
             {
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("bots");
-                TitleMemberListTypeTextBlock.Text = "Bots";
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.BOTSSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.BOTSSTATUS.CapitalizeFirstLetter();
             }
-            else if (searchstring == "active")
+            else if (searchstring == SlackConstants.ACTIVESTATUS)
             {
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("active");
-                TitleMemberListTypeTextBlock.Text = "Active";
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ACTIVESTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.ACTIVESTATUS.CapitalizeFirstLetter();
             }
-            else if (searchstring == "deleted")
+            else if (searchstring == SlackConstants.DELETEDSTATUS)
             {
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("deleted");
-                TitleMemberListTypeTextBlock.Text = "Deleted";
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.DELETEDSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.DELETEDSTATUS.CapitalizeFirstLetter();
             }
-            else if (searchstring == "all")
+            else if (searchstring == SlackConstants.ALLSTATUS)
             {
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
-                TitleMemberListTypeTextBlock.Text = "All";
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ALLSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.ALLSTATUS.CapitalizeFirstLetter();
             }
-            else if (searchstring == "away")
+            else if (searchstring == SlackConstants.AWAYSTATUS)
             {
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("away");
-                TitleMemberListTypeTextBlock.Text = "Away";
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.AWAYSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.AWAYSTATUS.CapitalizeFirstLetter();
             }
             else if (searchstring.Trim().Length > 0)
             {
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
-                TitleMemberListTypeTextBlock.Text = "All";
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ALLSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.ALLSTATUS.CapitalizeFirstLetter();
             }
             else
             {
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
-                TitleMemberListTypeTextBlock.Text = "All";
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ALLSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.ALLSTATUS.CapitalizeFirstLetter();
             }
         }
 
@@ -196,52 +195,52 @@ namespace SlackUsersList_Windows
             Border StatusTypeItem = (Border)sender;
             if (StatusTypeItem.Name == "RightPanelStatusTypeItemAllBorder")
             {
-                teamuserlist.FilterTeamList("all");
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
-                TitleMemberListTypeTextBlock.Text = "All";
-                UserSearchTextBox.Text = "all";
+                teamuserlist.FilterTeamList(SlackConstants.ALLSTATUS);
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ALLSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.ALLSTATUS.CapitalizeFirstLetter();
+                UserSearchTextBox.Text = SlackConstants.ALLSTATUS;
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemAdminBorder")
             {
-                teamuserlist.FilterTeamList("admin");
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("admin");
-                TitleMemberListTypeTextBlock.Text = "Admin";
-                UserSearchTextBox.Text = "admin";
+                teamuserlist.FilterTeamList(SlackConstants.ADMINSTATUS);
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ADMINSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.ADMINSTATUS.CapitalizeFirstLetter();
+                UserSearchTextBox.Text = SlackConstants.ADMINSTATUS;
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemOwnerBorder")
             {
-                teamuserlist.FilterTeamList("owner");
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("owner");
-                TitleMemberListTypeTextBlock.Text = "Owner";
-                UserSearchTextBox.Text = "owner";
+                teamuserlist.FilterTeamList(SlackConstants.OWNERSTATUS);
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.OWNERSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.OWNERSTATUS.CapitalizeFirstLetter();
+                UserSearchTextBox.Text = SlackConstants.OWNERSTATUS;
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemActiveBorder")
             {
-                teamuserlist.FilterTeamList("active");
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("active");
-                TitleMemberListTypeTextBlock.Text = "Active";
-                UserSearchTextBox.Text = "active";
+                teamuserlist.FilterTeamList(SlackConstants.ACTIVESTATUS);
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ACTIVESTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.ACTIVESTATUS;
+                UserSearchTextBox.Text = SlackConstants.ACTIVESTATUS;
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemBotsBorder")
             {
-                teamuserlist.FilterTeamList("bots");
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("bots");
-                TitleMemberListTypeTextBlock.Text = "Bots";
-                UserSearchTextBox.Text = "bots";
+                teamuserlist.FilterTeamList(SlackConstants.BOTSSTATUS);
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.BOTSSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.BOTSSTATUS.CapitalizeFirstLetter();
+                UserSearchTextBox.Text = SlackConstants.BOTSSTATUS;
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemDeletedBorder")
             {
-                teamuserlist.FilterTeamList("deleted");
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("deleted");
-                TitleMemberListTypeTextBlock.Text = "Deleted";
-                UserSearchTextBox.Text = "deleted";
+                teamuserlist.FilterTeamList(SlackConstants.DELETEDSTATUS);
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.DELETEDSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.DELETEDSTATUS.CapitalizeFirstLetter();
+                UserSearchTextBox.Text = SlackConstants.DELETEDSTATUS;
             }
             else if (StatusTypeItem.Name == "RightPanelStatusTypeItemAwayBorder")
             {
-                teamuserlist.FilterTeamList("away");
-                TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("away");
-                TitleMemberListTypeTextBlock.Text = "Away";
-                UserSearchTextBox.Text = "away";
+                teamuserlist.FilterTeamList(SlackConstants.AWAYSTATUS);
+                TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.AWAYSTATUS);
+                TitleMemberListTypeTextBlock.Text = SlackConstants.AWAYSTATUS.CapitalizeFirstLetter();
+                UserSearchTextBox.Text = SlackConstants.AWAYSTATUS;
             }
 
             RightPanelUserStatusTypeListBorder.Visibility = Visibility.Collapsed;
@@ -257,13 +256,13 @@ namespace SlackUsersList_Windows
             {
                 await teamuserlist.PopulateUsers(false);
                 UsersListLiveView.DataContext = teamuserlist;
-                teamuserlist.FilterTeamList("all");
+                teamuserlist.FilterTeamList(SlackConstants.ALLSTATUS);
                 
             }
 
             //Resets the search UI elements
-            TitleMemberListTypeStatusBorder.Background = slackconstants.getColor("all");
-            TitleMemberListTypeTextBlock.Text = "All";
+            TitleMemberListTypeStatusBorder.Background = SlackConstants.getColor(SlackConstants.ALLSTATUS);
+            TitleMemberListTypeTextBlock.Text = SlackConstants.ALLSTATUS;
             UserSearchTextBox.Text = "search (name, firstname or role)";
         }
 
@@ -291,7 +290,11 @@ namespace SlackUsersList_Windows
         // This event gets called when swiping item to the left
         async void UsersListLiveView_SwipeCallUser(object sender, EventArgs e)
         {
-            User user = teamuserlist.SelectTeamUser(UsersListLiveView.SelectUserID);
+            //Non Indexer Method
+            //User user = teamuserlist.SelectTeamUser(UsersListLiveView.SelectUserID);
+
+            //Indexer Method
+            User user = teamuserlist[UsersListLiveView.SelectUserID];
 
             if (user == null) return;
             if (user.profile.skype == "") return;
@@ -332,7 +335,7 @@ namespace SlackUsersList_Windows
             UserProfileStatusIndicatorBorder.Background = selecteduser.UserPresenceExcludingAwayStatusColor;
 
             //Presence Symbol "Z"
-            if (selecteduser.presence == "away")
+            if (selecteduser.presence == SlackConstants.AWAYSTATUS)
             {
                 UserProfileZStatusIndicatorBorder.Visibility = Visibility.Visible;
                 UserProfileZStatusIndicatorTextBox.Visibility = Visibility.Visible;

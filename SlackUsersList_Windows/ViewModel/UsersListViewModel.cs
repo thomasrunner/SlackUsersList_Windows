@@ -49,37 +49,47 @@ namespace SlackUsersList_Windows.ViewModel
             return new List<User>(teamlist.Where(x => x.id == userid))[0];
         }
 
+        //Indexer Method
+        public User this[string userid]
+        {
+            get
+            {
+                if (userid == "") return null;
+                return new List<User>(teamlist.Where(x => x.id == userid))[0];
+            }
+        }
+
         //filter team list
         public void FilterTeamList(string filtername)
         {
             filtername = filtername.ToLower();
-            if (filtername == "all")
+            if (filtername == SlackConstants.ALLSTATUS)
             {
                 teamlist = new List<User>(teamfulllist);
             }
-            else if (filtername == "admin")
+            else if (filtername == SlackConstants.ADMINSTATUS)
             {
                 teamlist = new List<User>(teamfulllist.Where(x => x.is_admin == true).ToList());
             }
-            else if (filtername == "owner")
+            else if (filtername == SlackConstants.OWNERSTATUS)
             {
                 teamlist = new List<User>(teamfulllist.Where(x => x.is_owner == true).ToList());
             }
-            else if (filtername == "active")
+            else if (filtername == SlackConstants.ACTIVESTATUS)
             {
-                teamlist = new List<User>(teamfulllist.Where(x => x.presence != "away").ToList());
+                teamlist = new List<User>(teamfulllist.Where(x => x.presence != SlackConstants.AWAYSTATUS).ToList());
             }
-            else if (filtername == "bots")
+            else if (filtername == SlackConstants.BOTSSTATUS)
             {
                 teamlist = new List<User>(teamfulllist.Where(x => x.IsSlackBot == true).ToList());
             }
-            else if (filtername == "deleted")
+            else if (filtername == SlackConstants.DELETEDSTATUS)
             {
                 teamlist = new List<User>(teamfulllist.Where(x => x.deleted == true).ToList());
             }
-            else if (filtername == "away")
+            else if (filtername == SlackConstants.AWAYSTATUS)
             {
-                teamlist = new List<User>(teamfulllist.Where(x => x.presence == "away").ToList());
+                teamlist = new List<User>(teamfulllist.Where(x => x.presence == SlackConstants.AWAYSTATUS).ToList());
             }
 
             //Update UI with changes
@@ -91,33 +101,33 @@ namespace SlackUsersList_Windows.ViewModel
         public void SearchTeamList(string searchstring)
         {
             searchstring = searchstring.ToLower();
-            if (searchstring == "all")
+            if (searchstring == SlackConstants.ALLSTATUS)
             {
                 teamlist = new List<User>(teamfulllist);
             }
-            else if (searchstring == "admin")
+            else if (searchstring == SlackConstants.ADMINSTATUS)
             {
                 teamlist = new List<User>(teamfulllist.Where(x => x.is_admin == true).ToList());
             }
-            else if (searchstring == "owner")
+            else if (searchstring == SlackConstants.OWNERSTATUS)
             {
                 teamlist = new List<User>(teamfulllist.Where(x => x.is_owner == true).ToList());
             }
-            else if (searchstring == "active")
+            else if (searchstring == SlackConstants.ACTIVESTATUS)
             {
-                teamlist = new List<User>(teamfulllist.Where(x => x.presence != "away").ToList());
+                teamlist = new List<User>(teamfulllist.Where(x => x.presence != SlackConstants.AWAYSTATUS).ToList());
             }
-            else if (searchstring == "bots")
+            else if (searchstring == SlackConstants.BOTSSTATUS)
             {
                 teamlist = new List<User>(teamfulllist.Where(x => x.IsSlackBot == true).ToList());
             }
-            else if (searchstring == "deleted")
+            else if (searchstring == SlackConstants.DELETEDSTATUS)
             {
                 teamlist = new List<User>(teamfulllist.Where(x => x.deleted == true).ToList());
             }
-            else if (searchstring == "away")
+            else if (searchstring == SlackConstants.AWAYSTATUS)
             {
-                teamlist = new List<User>(teamfulllist.Where(x => x.presence == "away").ToList());
+                teamlist = new List<User>(teamfulllist.Where(x => x.presence == SlackConstants.AWAYSTATUS).ToList());
             }
             else if (searchstring.Trim().Length > 0)
             {
@@ -182,7 +192,7 @@ namespace SlackUsersList_Windows.ViewModel
 
             //In a more complete solution I would put token as part of a logged in User Security Class, this allows for easier profile switching and portability as it can also be saved in the 
             //users roaming profile for Windows 8.1/10 or other Windows Phones. HERE IS JUST A SAMPLE TOKEN JUST REPLACE WITH YOUR OWN TEAMS TOKEN TO PLAY WITH
-            String contentstring = await slackapirequests.SlackAPIRequest("xoxp-5048173296-5048487710-19045732087-b5427e3b46", "https://slack.com/api/users.list");
+            String contentstring = await slackapirequests.SlackAPIGETRequest("xoxp-5048173296-5048487710-19045732087-b5427e3b46", "https://slack.com/api/users.list");
 
             if (contentstring.StartsWith("Error: No ") == false && contentstring.StartsWith("Connection Error: ") == false)
             {
@@ -215,9 +225,9 @@ namespace SlackUsersList_Windows.ViewModel
                         newmember.id = member.SelectToken("id").ToString();
                         newmember.name = member.SelectToken("name").ToString();
 
-                        if (member.SelectToken("deleted") != null)
+                        if (member.SelectToken(SlackConstants.DELETEDSTATUS) != null)
                         {
-                            if (member.SelectToken("deleted").ToString().ToLower() == "true")
+                            if (member.SelectToken(SlackConstants.DELETEDSTATUS).ToString().ToLower() == "true")
                             {
                                 newmember.deleted = true;
                             }

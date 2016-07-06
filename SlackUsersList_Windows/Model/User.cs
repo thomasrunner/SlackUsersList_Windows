@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI;
@@ -19,15 +20,16 @@ using Windows.UI.Xaml.Media.Imaging;
 /// </summary>
 namespace SlackUsersList_Windows.Model
 {
+    [DataContract]
     public class User
     {
-        private SlackConstants slackconstants = new SlackConstants();
-
+        [DataMember]
         public string id { get; set; }
 
         /// <summary>
         /// Slack bot is a special user account on the Slack Network
         /// </summary>
+        [IgnoreDataMember]
         public bool IsSlackBot
         {
             get
@@ -35,14 +37,32 @@ namespace SlackUsersList_Windows.Model
                 return id.Equals("USLACKBOT", StringComparison.CurrentCultureIgnoreCase);
             }
         }
+
+        [DataMember]
         public string name { get; set; }
+
+        [DataMember]
         public bool deleted { get; set; }
+
+        [DataMember]
         public string color { get; set; }
+
+        [DataMember]
         public UserProfile profile { get; set; }
+
+        [DataMember]
         public bool is_admin { get; set; }
+
+        [DataMember]
         public bool is_owner { get; set; }
+
+        [DataMember]
         public bool has_files { get; set; }
+
+        [DataMember]
         public bool has_2fa { get; set; }
+
+        [DataMember]
         public string presence { get; set; }
 
         /// <summary>
@@ -65,6 +85,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// This function loads only the image_24 when needed rather than when object is loaded and passes bitmap to the UI.
         /// </summary>
+        [IgnoreDataMember]
         public ImageSource image_24
         {
             get
@@ -87,6 +108,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// This function loads only the image_32 when needed rather than when object is loaded and passes bitmap to the UI.
         /// </summary>
+        [IgnoreDataMember]
         public ImageSource image_32
         {
             get
@@ -109,6 +131,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// This function loads only the image_48 when needed rather than when object is loaded and passes bitmap to the UI.
         /// </summary>
+        [IgnoreDataMember]
         public ImageSource image_48
         {
             get
@@ -131,6 +154,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// This function loads only the image_72 when needed rather than when object is loaded and passes bitmap to the UI.
         /// </summary>
+        [IgnoreDataMember]
         public ImageSource image_72
         {
             get
@@ -153,6 +177,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// This function loads only the image_192 when needed rather than when object is loaded and passes bitmap to the UI.
         /// </summary>
+        [IgnoreDataMember]
         public ImageSource image_192
         {
             get
@@ -175,6 +200,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// Simple cosmetic formatting function
         /// </summary>
+        [IgnoreDataMember]
         public string NamewithAtSymbol
         {
             get
@@ -186,6 +212,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// Simple cosmetic option to show email icon in list using Binding.
         /// </summary>
+        [IgnoreDataMember]
         public Visibility IsEmailAvailable
         {
             get
@@ -204,6 +231,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// Simple cosmetic option to show skype icon in list using Binding.
         /// </summary>
+        [IgnoreDataMember]
         public Visibility IsSkypeAvailable
         {
             get
@@ -222,6 +250,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// Simple cosmetic option to show skype icon in list using Binding.
         /// </summary>
+        [IgnoreDataMember]
         public Visibility IsPhoneAvailable
         {
             get
@@ -240,6 +269,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// Since Title can be "" this allows for a failover
         /// </summary>
+        [IgnoreDataMember]
         public string TitlewithNameFailover
         {
             get
@@ -265,6 +295,7 @@ namespace SlackUsersList_Windows.Model
         /// <summary>
         /// Since Title can be "" this allows for a failover
         /// </summary>
+        [IgnoreDataMember]
         public string RealNamewithNameFailover
         {
             get
@@ -288,36 +319,37 @@ namespace SlackUsersList_Windows.Model
         }
 
         /// Nice little visual indicator to show the different types of users and the user status
+        [IgnoreDataMember]
         public SolidColorBrush UserPresense
         {
             get
             {
                 if (deleted == false)
                 {
-                    if (presence == "away")
+                    if (presence == SlackConstants.AWAYSTATUS)
                     {
-                        return slackconstants.getColor("away");
+                        return SlackConstants.getColor(SlackConstants.AWAYSTATUS);
                     }
                     else if (is_admin == true)
                     {
-                        return slackconstants.getColor("admin");
+                        return SlackConstants.getColor(SlackConstants.ADMINSTATUS);
                     }
                     else if (is_owner == true)
                     {
-                        return slackconstants.getColor("owner");
+                        return SlackConstants.getColor(SlackConstants.OWNERSTATUS);
                     }
                     else if (IsSlackBot == true)
                     {
-                        return slackconstants.getColor("bots");
+                        return SlackConstants.getColor(SlackConstants.BOTSSTATUS);
                     }
                     else
                     {
-                        return slackconstants.getColor("active");
+                        return SlackConstants.getColor(SlackConstants.ACTIVESTATUS);
                     }
                 }
                 else
                 {
-                    return slackconstants.getColor("deleted");
+                    return SlackConstants.getColor(SlackConstants.DELETEDSTATUS);
                 }
 
             }
@@ -325,6 +357,7 @@ namespace SlackUsersList_Windows.Model
 
 
         /// Nice little visual indicator to show the different types of users and the user status, specific for user profile
+        [IgnoreDataMember]
         public SolidColorBrush UserPresenceExcludingAwayStatusColor
         {
             get
@@ -333,24 +366,24 @@ namespace SlackUsersList_Windows.Model
                 {
                     if (is_admin == true)
                     {
-                        return slackconstants.getColor("admin");
+                        return SlackConstants.getColor(SlackConstants.ADMINSTATUS);
                     }
                     else if (is_owner == true)
                     {
-                        return slackconstants.getColor("owner");
+                        return SlackConstants.getColor(SlackConstants.OWNERSTATUS);
                     }
                     else if (IsSlackBot == true)
                     {
-                        return slackconstants.getColor("bots");
+                        return SlackConstants.getColor(SlackConstants.BOTSSTATUS);
                     }
                     else
                     {
-                        return slackconstants.getColor("active");
+                        return SlackConstants.getColor(SlackConstants.ACTIVESTATUS);
                     }
                 }
                 else
                 {
-                    return slackconstants.getColor("deleted");
+                    return SlackConstants.getColor(SlackConstants.DELETEDSTATUS);
                 }
 
             }

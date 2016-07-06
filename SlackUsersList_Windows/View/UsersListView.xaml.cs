@@ -53,7 +53,7 @@ namespace SlackUsersList_Windows.View
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GaneralProfileLink_Tapped(object sender, TappedRoutedEventArgs e)
+        private async void GaneralProfileLink_Tapped(object sender, TappedRoutedEventArgs e)
         {
             User user = ((FrameworkElement)e.OriginalSource).DataContext as User;
             if (user != null)
@@ -61,7 +61,10 @@ namespace SlackUsersList_Windows.View
                 if (SelectedUserListViewItem != null)
                 {
                     selecteduserid = user.id;
-                    SelectedUserListViewItem(this, EventArgs.Empty);
+                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, ()=> 
+                    { 
+                        SelectedUserListViewItem(this, EventArgs.Empty);
+                    });
                 } 
                 
             }

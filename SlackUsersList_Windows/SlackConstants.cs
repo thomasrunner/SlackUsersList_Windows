@@ -9,30 +9,39 @@ using Windows.UI.Xaml.Media;
 namespace SlackUsersList_Windows
 {
 
-    public class SlackConstants
+    public static class SlackConstants
     {
         //Global Color Values for different user statuses
-        private Dictionary<string, SolidColorBrush> usercolorstatusdict;
+        private static Dictionary<string, SolidColorBrush> usercolorstatusdict;
 
-        public SlackConstants()
+        public const string USERLISTFILENAME = "users.json"; 
+        public const string ALLSTATUS = "all"; 
+        public const string ADMINSTATUS = "admin"; 
+        public const string OWNERSTATUS = "owner"; 
+        public const string ACTIVESTATUS = "active"; 
+        public const string BOTSSTATUS = "bots"; 
+        public const string DELETEDSTATUS = "deleted"; 
+        public const string AWAYSTATUS = "away"; 
+
+        static SlackConstants()
         {
             //Setting custom color when app loads.
             if (usercolorstatusdict == null)
             {
                 usercolorstatusdict = new Dictionary<string, SolidColorBrush>();
-                usercolorstatusdict.Add("all", new SolidColorBrush(Color.FromArgb(255, 224, 224, 224)));
-                usercolorstatusdict.Add("away", new SolidColorBrush(Color.FromArgb(255, 224, 224, 224)));
-                usercolorstatusdict.Add("admin", new SolidColorBrush(Color.FromArgb(255, 255, 196, 32)));
-                usercolorstatusdict.Add("owner", new SolidColorBrush(Color.FromArgb(255, 255, 128, 64)));
-                usercolorstatusdict.Add("bots", new SolidColorBrush(Color.FromArgb(255, 64, 196, 255)));
-                usercolorstatusdict.Add("deleted", new SolidColorBrush(Color.FromArgb(255, 255, 64, 64)));
-                usercolorstatusdict.Add("active", new SolidColorBrush(Color.FromArgb(255, 64, 224, 128)));
+                usercolorstatusdict.Add(SlackConstants.ALLSTATUS, new SolidColorBrush(Color.FromArgb(255, 224, 224, 224)));
+                usercolorstatusdict.Add(SlackConstants.AWAYSTATUS, new SolidColorBrush(Color.FromArgb(255, 224, 224, 224)));
+                usercolorstatusdict.Add(SlackConstants.ADMINSTATUS, new SolidColorBrush(Color.FromArgb(255, 255, 196, 32)));
+                usercolorstatusdict.Add(SlackConstants.OWNERSTATUS, new SolidColorBrush(Color.FromArgb(255, 255, 128, 64)));
+                usercolorstatusdict.Add(SlackConstants.BOTSSTATUS, new SolidColorBrush(Color.FromArgb(255, 64, 196, 255)));
+                usercolorstatusdict.Add(SlackConstants.DELETEDSTATUS, new SolidColorBrush(Color.FromArgb(255, 255, 64, 64)));
+                usercolorstatusdict.Add(SlackConstants.ACTIVESTATUS, new SolidColorBrush(Color.FromArgb(255, 64, 224, 128)));
             }
         }
 
-        public SolidColorBrush getColor(string userstatus)
+        public static SolidColorBrush getColor(string userstatus)
         {
-            if (userstatus == "") return usercolorstatusdict["all"];
+            if (userstatus == "") return usercolorstatusdict[SlackConstants.ALLSTATUS];
             SolidColorBrush requestcolor = usercolorstatusdict[userstatus];
             if (requestcolor != null)
             {
@@ -40,7 +49,7 @@ namespace SlackUsersList_Windows
             }
             else
             {
-                return usercolorstatusdict["all"];
+                return usercolorstatusdict[SlackConstants.ALLSTATUS];
             }
         }
     }

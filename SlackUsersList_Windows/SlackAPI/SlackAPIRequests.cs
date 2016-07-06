@@ -37,7 +37,7 @@ namespace SlackUsersList.SlackAPI
         }
 
         //  Actual API call Task, the User Token must be added as part of this call and not in the dictionary.
-        public async Task<String> SlackAPIRequest(string token, string apiurl)
+        public virtual async Task<String> SlackAPIGETRequest(string token, string apiurl)
         {
             if (token.Length == 0) return "Error: No token provided.";
             if (apiurl.Length == 0) return "Error: No api url provided.";
